@@ -42,6 +42,12 @@ public class Plane extends Geometry {
         _normal = normal.normalize();
     }
 
+    /**
+     * Retrieves the normal vector to the plane.
+     *
+     * @param point a point on the plane
+     * @return the normal vector of the plane
+     */
     @Override
     public Vector getNormal(Point point) {
         return _normal;
