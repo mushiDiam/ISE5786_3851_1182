@@ -1,9 +1,11 @@
 package geometries.impl;
 
+import geometries.api.Geometry;
+
 /**
  * Abstract class representing radial geometries (geometries with a radius).
  */
-public abstract class RadialGeometry {
+public abstract class RadialGeometry extends Geometry {
     /**
      * The radius of the geometric body.
      */

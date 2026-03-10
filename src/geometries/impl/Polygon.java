@@ -5,6 +5,8 @@ import static primitives.Util.isZero;
 import java.util.List;
 
 import geometries.api.Geometry;
+import primitives.Point;
+import primitives.Vector;
 
 /**
  * Represents a convex polygon in a 3D Cartesian coordinate system.
@@ -52,7 +54,7 @@ public class Polygon extends Geometry {
       _plane    = new Plane(vertices[0], vertices[1], vertices[2]);
       if (_size == 3) return; // no need for more tests for a Triangle
 
-      Vector  n        = _plane.getNormal(vertices[0]);
+      Vector n        = _plane.getNormal(vertices[0]);
       // Subtracting identical vertices would create a zero vector (illegal)
       Vector  edge1    = vertices[_size - 1].subtract(vertices[_size - 2]);
       Vector  edge2    = vertices[0].subtract(vertices[_size - 1]);
