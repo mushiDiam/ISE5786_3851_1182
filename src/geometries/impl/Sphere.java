@@ -1,6 +1,5 @@
 package geometries.impl;
 
-import geometries.api.Geometry;
 import primitives.Point;
 import primitives.Vector;
 

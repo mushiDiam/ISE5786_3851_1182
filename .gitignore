@@ -30,4 +30,4 @@ bin/
 .DS_Store
 
 ### Custom ###
-doc/
+/doc/

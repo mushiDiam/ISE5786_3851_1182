@@ -1,7 +1,5 @@
 package primitives;
 
-import java.util.Objects;
-
 /**
  * Represents a 3D point in space.
  */
@@ -24,6 +22,7 @@ public class Point {
     /**
      * Constructor for Point using 3 coordinates.
      * * @param x the x coordinate
+     *
      * @param y the y coordinate
      * @param z the z coordinate
      */
@@ -42,6 +41,7 @@ public class Point {
     /**
      * Subtracts a point from this point, returning a vector from the other point to this point.
      * * @param p the point to subtract
+     *
      * @return a new Vector representing the difference
      */
     public Vector subtract(Point p) {
@@ -51,6 +51,7 @@ public class Point {
     /**
      * Adds a vector to this point, returning a new point.
      * * @param v the vector to add
+     *
      * @return a new Point representing the sum
      */
     public Point add(Vector v) {
@@ -60,6 +61,7 @@ public class Point {
     /**
      * Computes the squared distance between this point and another point.
      * * @param p the other point
+     *
      * @return the squared distance
      */
     public double distanceSquared(Point p) {
@@ -73,6 +75,7 @@ public class Point {
     /**
      * Computes the distance between this point and another point.
      * * @param p the other point
+     *
      * @return the distance
      */
     public double distance(Point p) {
