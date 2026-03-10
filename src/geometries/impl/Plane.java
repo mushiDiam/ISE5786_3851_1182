@@ -28,7 +28,7 @@ public class Plane extends Geometry {
      */
     public Plane(Point p1, Point p2, Point p3) {
         _q = p1;
-        _normal = null; // Temporary: normal is not calculated at this stage
+        _normal = null; // TODO
     }
 
     /**

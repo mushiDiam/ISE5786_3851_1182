@@ -26,6 +26,6 @@ public class Sphere extends RadialGeometry {
 
     @Override
     public Vector getNormal(Point point) {
-        return null; // Temporary: normal is not calculated at this stage
+        return null; // TODO
     }
 }
