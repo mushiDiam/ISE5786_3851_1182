@@ -7,11 +7,11 @@ import primitives.Vector;
 /**
  * Represents a 3D plane.
  */
-public class Plane extends Geometry {
+public final class Plane extends Geometry {
     /**
      * A point on the plane.
      */
-    private final Point _q;
+    private final Point _point;
 
     /**
      * The normal vector to the plane.
@@ -27,18 +27,23 @@ public class Plane extends Geometry {
      * @param p3 third point
      */
     public Plane(Point p1, Point p2, Point p3) {
-        _q = p1;
-        _normal = null; // TODO
+        _point = p1;
+        _normal = null;
+        // TODO:
+        // Vector v1 = p2.subtract(p1);
+        // Vector v2 = p3.subtract(p2);
+        // _normal = v1.crossProduct(v2).normalize();
+        // for later use
     }
 
     /**
      * Constructor for Plane using a point and a normal vector.
      *
-     * @param q      a point on the plane
+     * @param point  a point on the plane
      * @param normal the normal vector to the plane
      */
-    public Plane(Point q, Vector normal) {
-        _q = q;
+    public Plane(Point point, Vector normal) {
+        _point = point;
         _normal = normal.normalize();
     }
 

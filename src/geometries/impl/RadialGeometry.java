@@ -9,12 +9,12 @@ public abstract class RadialGeometry extends Geometry {
     /**
      * The radius of the geometric body.
      */
-    protected final double radius;
+    protected final double _radius;
 
     /**
      * The squared radius of the geometric body (used for performance optimization).
      */
-    protected final double radiusSquared;
+    protected final double _radiusSquared;
 
     /**
      * Constructs a radial geometry with a given radius.
@@ -22,8 +22,8 @@ public abstract class RadialGeometry extends Geometry {
      *
      * @param radius the radius of the geometry
      */
-    public RadialGeometry(double _radius) {
-        this.radius = _radius;
-        this.radiusSquared = _radius * _radius;
+    public RadialGeometry(double radius) {
+        this._radius = radius;
+        this._radiusSquared = radius * radius;
     }
 }
