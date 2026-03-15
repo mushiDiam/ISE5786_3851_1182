@@ -77,7 +77,7 @@ public final class Vector extends Point {
     }
 
     /**
-     * cross product between two vector
+     * cross product between two vectors
      *
      * @param v vector
      * @return a new vector

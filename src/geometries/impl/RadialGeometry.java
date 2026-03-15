@@ -20,7 +20,7 @@ public abstract class RadialGeometry extends Geometry {
      * Constructs a radial geometry with a given radius.
      * Initializes both the radius and the squared radius fields.
      *
-     * @param _radius the radius of the geometry
+     * @param radius the radius of the geometry
      */
     public RadialGeometry(double radius) {
         this._radius = radius;
