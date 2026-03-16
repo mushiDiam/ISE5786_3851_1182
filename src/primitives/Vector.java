@@ -41,11 +41,6 @@ public final class Vector extends Point {
         return super.equals(obj);
     }
 
-    @Override
-    public String toString() {
-        return "->" + super.toString();
-    }
-
     /**
      * Add two vectors
      *
