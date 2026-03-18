@@ -27,6 +27,28 @@ public class Cylinder extends Tube {
 
     @Override
     public Vector getNormal(Point point) {
-        return null; // TODO: normal
+        Point p0 = _axis.origin();
+        Vector v = _axis.direction();
+
+        // BV02: Point is exactly at the center of the bottom base
+        if (point.equals(p0)) {
+            return v.scale(-1);
+        }
+
+        // Calculate the projection scalar 't' of the point on the axis
+        double t = v.dotProduct(point.subtract(p0));
+
+        // EP03 & BV04: Point is on the bottom base (t == 0)
+        if (primitives.Util.isZero(t)) {
+            return v.scale(-1);
+        }
+
+        // EP02 & BV01 & BV03: Point is on the top base (t == height)
+        if (primitives.Util.isZero(t - _height)) {
+            return v;
+        }
+
+        // EP01: Point is on the side surface, so we can use the Tube's logic
+        return super.getNormal(point);
     }
 }
