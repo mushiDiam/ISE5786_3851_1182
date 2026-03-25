@@ -2,7 +2,10 @@ package geometries.impl;
 
 import geometries.api.Geometry;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+
+import java.util.List;
 
 /**
  * Represents a 3D plane.
@@ -53,5 +56,38 @@ public final class Plane extends Geometry {
     @Override
     public Vector getNormal(Point point) {
         return _normal;
+    }
+
+    /**
+     * Finds intersections between a ray and the plane.
+     * * @param ray the ray to intersect with the plane
+     * @return a list of intersection points, or null if there are none
+     */
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        Point p0 = ray.origin();
+        Vector v = ray.direction();
+        Vector n = _normal;
+
+        // Ensure the ray origin is not the same as the plane's reference point
+        if (_point.equals(p0)) {
+            return null;
+        }
+
+        double nv = n.dotProduct(v);
+
+        // Ray is parallel to the plane [cite: 47, 48]
+        if (primitives.Util.isZero(nv)) {
+            return null;
+        }
+
+        Vector p0ToQ0 = _point.subtract(p0);
+        double nQMinusP0 = n.dotProduct(p0ToQ0);
+
+        // Calculate scaling factor t [cite: 49]
+        double t = primitives.Util.alignZero(nQMinusP0 / nv);
+
+        // Intersections are only valid in the direction of the ray (t > 0) [cite: 50, 53]
+        return t <= 0 ? null : List.of(ray.getPoint(t));
     }
 }

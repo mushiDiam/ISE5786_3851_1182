@@ -2,6 +2,7 @@ package geometries.impl;
 
 import geometries.api.Geometry;
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
 
 import java.util.List;
@@ -92,5 +93,51 @@ public class Polygon extends Geometry {
     @Override
     public Vector getNormal(Point point) {
         return _plane.getNormal(point);
+    }
+
+    /**
+     * Finds intersections between a ray and the polygon.
+     * Checks if the intersection point with the polygon's plane falls inside the polygon boundaries.
+     *
+     * @param ray the ray to intersect with the polygon
+     * @return a list containing the intersection point, or null if there is none
+     */
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        // First, check if the ray intersects the plane of the polygon
+        List<Point> planeIntersections = _plane.findIntersections(ray);
+        if (planeIntersections == null) {
+            return null;
+        }
+
+        Point p0 = ray.origin();
+        Vector v = ray.direction();
+
+        // Calculate the sign of the first cross product
+        Vector v1 = _vertices.get(0).subtract(p0);
+        Vector v2 = _vertices.get(1).subtract(p0);
+        double sign = primitives.Util.alignZero(v.dotProduct(v1.crossProduct(v2)));
+
+        if (sign == 0) {
+            return null; // On edge or vertex
+        }
+
+        boolean positive = sign > 0;
+
+        // Verify the sign remains the same for all consecutive vertices
+        for (int i = 1; i < _vertices.size(); i++) {
+            v1 = v2;
+            v2 = _vertices.get((i + 1) % _vertices.size()).subtract(p0);
+
+            double currentSign = primitives.Util.alignZero(v.dotProduct(v1.crossProduct(v2)));
+            if (currentSign == 0) {
+                return null; // On edge or vertex
+            }
+            if ((currentSign > 0) != positive) {
+                return null; // Point is outside the polygon
+            }
+        }
+
+        return planeIntersections;
     }
 }

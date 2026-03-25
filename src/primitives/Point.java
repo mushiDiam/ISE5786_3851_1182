@@ -37,6 +37,10 @@ public class Point {
         this._xyz = xyz;
     }
 
+    public double getX() { return _xyz._d1(); }
+    public double getY() { return _xyz._d2(); }
+    public double getZ() { return _xyz._d3(); }
+
     /**
      * Subtracts a point from this point, returning a vector from the other point to this point.
      * @param p the point to subtract

@@ -5,7 +5,9 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link geometries.impl.Cylinder} class.
@@ -49,5 +51,51 @@ class CylinderTests {
         // BV04: Point on the edge between side and bottom base
         assertEquals(new Vector(0, 0, -1), cylinder.getNormal(new Point(1, 0, 0)),
                 "ERROR: getNormal() wrong result for edge of bottom base");
+    }
+
+    /**
+     * Test method for {@link geometries.impl.Cylinder#findIntersections(primitives.Ray)}.
+     */
+    @Test
+    void testFindIntersections() {
+        Cylinder cylinder = new Cylinder(1d, new Ray(new Point(0, 0, 0), new Vector(0, 0, 1)), 2d);
+
+        // ============ Equivalence Partitions Tests ==============
+        // EP01: Ray crosses the side surface twice
+        List<Point> result01 = cylinder.findIntersections(new Ray(new Point(-2, 0, 1), new Vector(1, 0, 0)));
+        assertNotNull(result01, "Wrong cylinder intersection");
+        assertEquals(2, result01.size(), "Wrong number of points");
+
+        // EP02: Ray crosses a base and the side surface
+        List<Point> result02 = cylinder.findIntersections(
+                new Ray(new Point(0.5, 0, -1), new Vector(0, 0.5, 1)));
+        assertNotNull(result02, "Wrong cylinder intersection");
+        assertEquals(2, result02.size(), "Wrong number of points");
+
+        // EP03: Ray crosses both bases
+        List<Point> result03 = cylinder.findIntersections(new Ray(new Point(0, 0.5, -1), new Vector(0, 0, 1)));
+        assertNotNull(result03, "Wrong cylinder intersection");
+        assertEquals(2, result03.size(), "Wrong number of points");
+
+        // EP04: Ray outside the cylinder (0 points)
+        assertNull(cylinder.findIntersections(new Ray(new Point(0, 0, 3), new Vector(1, 0, 0))),
+                "Ray outside cylinder");
+
+        // =============== Boundary Values Tests ==================
+        // BV01: Ray passes through exactly the center of both bases
+        List<Point> resultBV01 = cylinder.findIntersections(new Ray(new Point(0, 0, -1), new Vector(0, 0, 1)));
+        assertNotNull(resultBV01, "Wrong cylinder intersection");
+        assertEquals(2, resultBV01.size(), "Ray passing through centers");
+    }
+
+    @Test
+    void testFindIntersections1() {
+        Cylinder cylinder = new Cylinder(1d, new Ray(new Point(0, 0, 0), new Vector(0, 0, 1)), 2d);
+
+        System.out.println("EP01: " + cylinder.findIntersections(new Ray(new Point(-2, 0, 1), new Vector(1, 0, 0))));
+        System.out.println("EP02: " + cylinder.findIntersections(new Ray(new Point(0, 0.5, -1), new Vector(0, 1, 1))));
+        System.out.println("EP03: " + cylinder.findIntersections(new Ray(new Point(0, 0.5, -1), new Vector(0, 0, 1))));
+        System.out.println("EP04: " + cylinder.findIntersections(new Ray(new Point(0, 0, 3), new Vector(1, 0, 0))));
+        System.out.println("BV01: " + cylinder.findIntersections(new Ray(new Point(0, 0, -1), new Vector(0, 0, 1))));
     }
 }

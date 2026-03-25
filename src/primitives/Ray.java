@@ -41,6 +41,19 @@ public final class Ray {
         return _origin;
     }
 
+    /**
+     * Calculates a point on the ray line at a given distance from the origin.
+     *
+     * @param t the distance (scalar) from the origin
+     * @return a new Point at distance t from the origin
+     */
+    public Point getPoint(double t) {
+        if (primitives.Util.isZero(t)) {
+            return _origin;
+        }
+        return _origin.add(_direction.scale(t));
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

@@ -8,7 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+
+import java.util.List;
 
 /**
  * Unit tests for class {@link Polygon}.
@@ -130,5 +133,43 @@ class PolygonTests {
             Vector edge = pts[i].subtract(pts[i == 0 ? pts.length - 1 : i - 1]);
             assertEquals(0d, result.dotProduct(edge), DELTA, "Polygon normal is not orthogonal to an edge");
         }
+    }
+
+    /**
+     * Test method for {@link geometries.impl.Polygon#findIntersections(primitives.Ray)}.
+     */
+    @Test
+    void testFindIntersections() {
+        Polygon polygon = new Polygon(
+                new Point(0, 2, 0), new Point(2, 0, 0),
+                new Point(0, -2, 0), new Point(-2, 0, 0)
+        );
+
+        // ============ Equivalence Partitions Tests ==============
+        // EP01: Ray intersects inside the polygon
+        List<Point> result01 = polygon.findIntersections(new Ray(new Point(0, 0, -1), new Vector(0, 0, 1)));
+        assertEquals(1, result01.size(), "Wrong number of points");
+        assertEquals(new Point(0, 0, 0), result01.get(0), "Ray crosses inside polygon");
+
+        // EP02: Ray outside against edge
+        assertNull(polygon.findIntersections(new Ray(new Point(2, 2, -1), new Vector(0, 0, 1))),
+                "Ray outside against edge");
+
+        // EP03: Ray outside against vertex
+        assertNull(polygon.findIntersections(new Ray(new Point(3, 0, -1), new Vector(0, 0, 1))),
+                "Ray outside against vertex");
+
+        // =============== Boundary Values Tests ==================
+        // BV01: Ray intersects on edge
+        assertNull(polygon.findIntersections(new Ray(new Point(1, 1, -1), new Vector(0, 0, 1))),
+                "Ray intersects on edge");
+
+        // BV02: Ray intersects in vertex
+        assertNull(polygon.findIntersections(new Ray(new Point(2, 0, -1), new Vector(0, 0, 1))),
+                "Ray intersects on vertex");
+
+        // BV03: Ray intersects on edge's continuation
+        assertNull(polygon.findIntersections(new Ray(new Point(3, -1, -1), new Vector(0, 0, 1))),
+                "Ray intersects on edge's continuation");
     }
 }

@@ -4,6 +4,8 @@ import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
+import java.util.List;
+
 /**
  * Represents an infinite tube in 3D space.
  */
@@ -45,5 +47,81 @@ public class Tube extends RadialGeometry {
 
         // The normal is the normalized vector from the axis point 'o' to the given point
         return point.subtract(o).normalize();
+    }
+
+    /**
+     * Finds intersections between a ray and the infinite tube.
+     */
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        Point p0 = ray.origin();
+        Vector v = ray.direction();
+        Point pa = _axis.origin();
+        Vector va = _axis.direction();
+
+        Vector deltaP = null;
+        try {
+            deltaP = p0.subtract(pa);
+        } catch (IllegalArgumentException e) {
+            // p0 == pa (deltaP would be the zero vector)
+        }
+
+        double vDotVa = primitives.Util.alignZero(v.dotProduct(va));
+        Vector vMinusVaVdotVa = v;
+
+        // Handle orthogonal and parallel vectors properly without crashing
+        if (vDotVa != 0) {
+            try {
+                vMinusVaVdotVa = v.subtract(va.scale(vDotVa));
+            } catch (IllegalArgumentException e) {
+                // v is parallel to va (A = 0). Ray is parallel to tube's axis.
+                return null;
+            }
+        }
+
+        double a = primitives.Util.alignZero(vMinusVaVdotVa.lengthSquared());
+        double b = 0;
+        double c = -_radiusSquared;
+
+        if (deltaP != null) {
+            double dpDotVa = primitives.Util.alignZero(deltaP.dotProduct(va));
+            Vector dpMinusVaDpDotVa = deltaP;
+
+            if (dpDotVa != 0) {
+                try {
+                    dpMinusVaDpDotVa = deltaP.subtract(va.scale(dpDotVa));
+                } catch (IllegalArgumentException e) {
+                    dpMinusVaDpDotVa = null; // deltaP is parallel to va
+                }
+            }
+
+            if (dpMinusVaDpDotVa != null) {
+                b = primitives.Util.alignZero(2 * vMinusVaVdotVa.dotProduct(dpMinusVaDpDotVa));
+                c += primitives.Util.alignZero(dpMinusVaDpDotVa.lengthSquared());
+            }
+        }
+
+        double discriminant = primitives.Util.alignZero(b * b - 4 * a * c);
+
+        // No intersection or tangent (tangents are not included per PDF instructions)
+        if (discriminant <= 0) {
+            return null;
+        }
+
+        double sqrtDiscr = Math.sqrt(discriminant);
+        double t1 = primitives.Util.alignZero((-b - sqrtDiscr) / (2 * a));
+        double t2 = primitives.Util.alignZero((-b + sqrtDiscr) / (2 * a));
+
+        if (t1 > 0 && t2 > 0) {
+            return List.of(ray.getPoint(t1), ray.getPoint(t2));
+        }
+        if (t1 > 0) {
+            return List.of(ray.getPoint(t1));
+        }
+        if (t2 > 0) {
+            return List.of(ray.getPoint(t2));
+        }
+
+        return null;
     }
 }

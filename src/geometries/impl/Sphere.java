@@ -1,7 +1,10 @@
 package geometries.impl;
 
 import primitives.Point;
+import primitives.Ray;
 import primitives.Vector;
+
+import java.util.List;
 
 /**
  * Represents a 3D sphere.
@@ -34,5 +37,46 @@ public class Sphere extends RadialGeometry {
         // The normal to a sphere at a given point is the normalized vector
         // starting from the center and ending at the point.
         return point.subtract(_center).normalize();
+    }
+
+    /**
+     * Finds intersections between a ray and the sphere.
+     *
+     * @param ray the ray to intersect with the sphere
+     * @return a list of intersection points, or null if there are none
+     */
+    @Override
+    public List<Point> findIntersections(Ray ray) {
+        Point p0 = ray.origin();
+        Vector v = ray.direction();
+
+        if (p0.equals(_center)) {
+            return List.of(ray.getPoint(_radius));
+        }
+
+        Vector u = _center.subtract(p0);
+        double tm = primitives.Util.alignZero(v.dotProduct(u));
+        double dSquared = primitives.Util.alignZero(u.lengthSquared() - tm * tm);
+        double thSquared = primitives.Util.alignZero(_radiusSquared - dSquared);
+
+        if (thSquared <= 0) {
+            return null; // No intersection or tangent
+        }
+
+        double th = primitives.Util.alignZero(Math.sqrt(thSquared));
+        double t1 = primitives.Util.alignZero(tm - th);
+        double t2 = primitives.Util.alignZero(tm + th);
+
+        if (t1 > 0 && t2 > 0) {
+            return List.of(ray.getPoint(t1), ray.getPoint(t2)); // Sorted naturally by distance
+        }
+        if (t1 > 0) {
+            return List.of(ray.getPoint(t1));
+        }
+        if (t2 > 0) {
+            return List.of(ray.getPoint(t2));
+        }
+
+        return null;
     }
 }
