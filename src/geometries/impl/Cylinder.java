@@ -74,11 +74,16 @@ public class Cylinder extends Tube {
         double t1 = -1, t2 = -1;
         int count = 0;
 
-        // 1. Check side intersections from Tube bounded by height
+        // 1. Check side intersections from Tube (STRICTLY bounded by height)
         if (tubeIntersections != null) {
             for (Point p : tubeIntersections) {
-                double tAxis = primitives.Util.alignZero(va.dotProduct(p.subtract(pa1)));
-                if (tAxis > 0 && tAxis < _height) { // Strictly between bases
+                double tAxis = 0;
+                if (!p.equals(pa1)) {
+                    tAxis = primitives.Util.alignZero(va.dotProduct(p.subtract(pa1)));
+                }
+
+                // Strictly inside the cylinder. Rims are handled by the bases.
+                if (tAxis > 0 && primitives.Util.alignZero(tAxis - _height) < 0) {
                     double distance = p0.distance(p);
                     if (count == 0) t1 = distance;
                     else t2 = distance;
@@ -87,47 +92,57 @@ public class Cylinder extends Tube {
             }
         }
 
+        // If we found 2 points on the side, we don't need to check the bases
         if (count == 2) {
             return createSortedList(ray, t1, t2);
         }
 
-        // 2. Check base 1 (bottom)
+        // 2. Check bases
         double vDotVa = primitives.Util.alignZero(v.dotProduct(va));
-        if (vDotVa != 0) { // Not parallel to base
-            try {
-                double tBase1 = primitives.Util.alignZero(va.dotProduct(pa1.subtract(p0)) / vDotVa);
-                if (tBase1 > 0) {
-                    Point pBase1 = ray.getPoint(tBase1);
-                    if (primitives.Util.alignZero(pBase1.distanceSquared(pa1) - _radiusSquared) < 0) {
-                        if (count == 0) t1 = tBase1;
-                        else t2 = tBase1;
-                        count++;
-                    }
+        if (vDotVa != 0) { // If vDotVa == 0, ray is parallel to bases (orthogonal to axis). Bases are ignored.
+            boolean isParallelToAxis = primitives.Util.isZero(Math.abs(vDotVa) - 1);
+
+            // Base 1 (bottom)
+            double tBase1 = -1;
+            if (!p0.equals(pa1)) {
+                tBase1 = primitives.Util.alignZero(va.dotProduct(pa1.subtract(p0)) / vDotVa);
+            }
+            if (tBase1 > 0) {
+                Point pBase1 = ray.getPoint(tBase1);
+                double dSquared = pBase1.distanceSquared(pa1);
+                double check = primitives.Util.alignZero(dSquared - _radiusSquared);
+
+                // If parallel to axis, reject the rim (check < 0). Otherwise, accept the rim (check <= 0).
+                if ((isParallelToAxis && check < 0) || (!isParallelToAxis && check <= 0)) {
+                    if (count == 0) t1 = tBase1;
+                    else t2 = tBase1;
+                    count++;
                 }
-            } catch (IllegalArgumentException e) {
-                // p0 is on pa1, handled by tBase1 <= 0 logic since intersection must be t > 0
+            }
+
+            if (count == 2) {
+                return createSortedList(ray, t1, t2);
+            }
+
+            // Base 2 (top)
+            double tBase2 = -1;
+            if (!p0.equals(pa2)) {
+                tBase2 = primitives.Util.alignZero(va.dotProduct(pa2.subtract(p0)) / vDotVa);
+            }
+            if (tBase2 > 0) {
+                Point pBase2 = ray.getPoint(tBase2);
+                double dSquared = pBase2.distanceSquared(pa2);
+                double check = primitives.Util.alignZero(dSquared - _radiusSquared);
+
+                if ((isParallelToAxis && check < 0) || (!isParallelToAxis && check <= 0)) {
+                    if (count == 0) t1 = tBase2;
+                    else t2 = tBase2;
+                    count++;
+                }
             }
         }
 
-        if (count == 2) {
-            return createSortedList(ray, t1, t2);
-        }
-
-        // 3. Check base 2 (top)
-        if (vDotVa != 0) {
-            try {
-                double tBase2 = primitives.Util.alignZero(va.dotProduct(pa2.subtract(p0)) / vDotVa);
-                if (tBase2 > 0) {
-                    Point pBase2 = ray.getPoint(tBase2);
-                    if (primitives.Util.alignZero(pBase2.distanceSquared(pa2) - _radiusSquared) < 0) {
-                        if (count == 0) t1 = tBase2;
-                        else t2 = tBase2;
-                        count++;
-                    }
-                }
-            } catch (IllegalArgumentException e) {}
-        }
-
+        // 3. Final return
         if (count == 1) {
             return List.of(ray.getPoint(t1));
         } else if (count == 2) {

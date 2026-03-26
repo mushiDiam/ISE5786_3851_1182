@@ -53,49 +53,96 @@ class CylinderTests {
                 "ERROR: getNormal() wrong result for edge of bottom base");
     }
 
+    private static final double RADIUS = 2d;
+    private static final double HEIGHT = 4d;
+    private static final Ray AXIS = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
+    private static final Cylinder CYLINDER = new Cylinder(RADIUS, AXIS, HEIGHT);
+
     /**
      * Test method for {@link geometries.impl.Cylinder#findIntersections(primitives.Ray)}.
      */
     @Test
     void testFindIntersections() {
-        Cylinder cylinder = new Cylinder(1d, new Ray(new Point(0, 0, 0), new Vector(0, 0, 1)), 2d);
-
         // ============ Equivalence Partitions Tests ==============
-        // EP01: Ray crosses the side surface twice
-        List<Point> result01 = cylinder.findIntersections(new Ray(new Point(-2, 0, 1), new Vector(1, 0, 0)));
-        assertNotNull(result01, "Wrong cylinder intersection");
-        assertEquals(2, result01.size(), "Wrong number of points");
+        // EP01: Ray crosses the side surface side-to-side (2 points)
+        List<Point> resultEP01 = CYLINDER.findIntersections(new Ray(new Point(-4, 0, 2), new Vector(1, 0, 0)));
+        assertNotNull(resultEP01, "Expected intersections");
+        assertEquals(2, resultEP01.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(-2, 0, 2), new Point(2, 0, 2)), resultEP01, "Side to side cross");
 
-        // EP02: Ray crosses a base and the side surface
-        List<Point> result02 = cylinder.findIntersections(
-                new Ray(new Point(0.5, 0, -1), new Vector(0, 0.5, 1)));
-        assertNotNull(result02, "Wrong cylinder intersection");
-        assertEquals(2, result02.size(), "Wrong number of points");
+        // EP02: Ray crosses from bottom base to top base (2 points)
+        List<Point> resultEP02 = CYLINDER.findIntersections(new Ray(new Point(0, 0, -1), new Vector(0, 0, 1)));
+        assertNotNull(resultEP02, "Expected intersections");
+        assertEquals(2, resultEP02.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(0, 0, 0), new Point(0, 0, 4)), resultEP02, "Base to base cross");
 
-        // EP03: Ray crosses both bases
-        List<Point> result03 = cylinder.findIntersections(new Ray(new Point(0, 0.5, -1), new Vector(0, 0, 1)));
-        assertNotNull(result03, "Wrong cylinder intersection");
-        assertEquals(2, result03.size(), "Wrong number of points");
+        // EP03: Ray crosses from bottom base to side surface (2 points)
+        List<Point> resultEP03 = CYLINDER.findIntersections(new Ray(new Point(0, 0, -1), new Vector(1, 0, 1)));
+        assertNotNull(resultEP03, "Expected intersections");
+        assertEquals(2, resultEP03.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(1, 0, 0), new Point(2, 0, 1)), resultEP03, "Base to side cross");
 
-        // EP04: Ray outside the cylinder (0 points)
-        assertNull(cylinder.findIntersections(new Ray(new Point(0, 0, 3), new Vector(1, 0, 0))),
+        // EP04: Ray is completely outside the cylinder (0 points)
+        assertNull(CYLINDER.findIntersections(new Ray(new Point(4, 0, 0), new Vector(0, 1, 1))),
                 "Ray outside cylinder");
 
         // =============== Boundary Values Tests ==================
-        // BV01: Ray passes through exactly the center of both bases
-        List<Point> resultBV01 = cylinder.findIntersections(new Ray(new Point(0, 0, -1), new Vector(0, 0, 1)));
-        assertNotNull(resultBV01, "Wrong cylinder intersection");
-        assertEquals(2, resultBV01.size(), "Ray passing through centers");
-    }
 
-    @Test
-    void testFindIntersections1() {
-        Cylinder cylinder = new Cylinder(1d, new Ray(new Point(0, 0, 0), new Vector(0, 0, 1)), 2d);
+        // **** Group 1: Ray is parallel to the cylinder's axis
+        // BV11: Ray parallel, strictly inside cylinder (2 points - crosses both bases)
+        List<Point> resultBV11 = CYLINDER.findIntersections(new Ray(new Point(1, 0, -1), new Vector(0, 0, 1)));
+        assertNotNull(resultBV11, "Expected intersections");
+        assertEquals(2, resultBV11.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(1, 0, 0), new Point(1, 0, 4)), resultBV11, "Parallel inside");
 
-        System.out.println("EP01: " + cylinder.findIntersections(new Ray(new Point(-2, 0, 1), new Vector(1, 0, 0))));
-        System.out.println("EP02: " + cylinder.findIntersections(new Ray(new Point(0, 0.5, -1), new Vector(0, 1, 1))));
-        System.out.println("EP03: " + cylinder.findIntersections(new Ray(new Point(0, 0.5, -1), new Vector(0, 0, 1))));
-        System.out.println("EP04: " + cylinder.findIntersections(new Ray(new Point(0, 0, 3), new Vector(1, 0, 0))));
-        System.out.println("BV01: " + cylinder.findIntersections(new Ray(new Point(0, 0, -1), new Vector(0, 0, 1))));
+        // BV12: Ray parallel, exactly on the side surface (0 points - tangent to the cylinder)
+        // Per PDF, junction points are included UNLESS it's a tangent ("לא אם מדובר בהשקה").
+        assertNull(CYLINDER.findIntersections(new Ray(new Point(2, 0, -1), new Vector(0, 0, 1))),
+                "Parallel ray on surface is tangent and should return null");
+
+        // BV13: Ray parallel, outside cylinder (0 points)
+        assertNull(CYLINDER.findIntersections(new Ray(new Point(3, 0, -1), new Vector(0, 0, 1))),
+                "Parallel outside");
+
+        // **** Group 2: Ray is orthogonal to the cylinder's axis
+        // BV21: Ray orthogonal, crosses side to side, strictly between bases (2 points)
+        List<Point> resultBV21 = CYLINDER.findIntersections(new Ray(new Point(-4, 0, 2), new Vector(1, 0, 0)));
+        assertNotNull(resultBV21, "Expected intersections");
+        assertEquals(2, resultBV21.size(), "Wrong number of points");
+
+        // BV22: Ray orthogonal, exactly on the plane of the bottom base, crossing the base (0 points)
+        // Ray on the base plane is considered tangent to the cylinder's 3D volume.
+        assertNull(CYLINDER.findIntersections(new Ray(new Point(-4, 0, 0), new Vector(1, 0, 0))),
+                "Orthogonal exactly on bottom base plane");
+
+        // BV23: Ray orthogonal, completely above the top base (0 points)
+        assertNull(CYLINDER.findIntersections(new Ray(new Point(-4, 0, 5), new Vector(1, 0, 0))),
+                "Orthogonal above top base");
+
+        // **** Group 3: Intersections exactly at the rims (junction of base and side)
+        // BV31: Ray crosses exactly through the bottom and top rims (2 points)
+        List<Point> resultBV31 = CYLINDER.findIntersections(new Ray(new Point(-4, 0, -2), new Vector(1, 0, 1)));
+        assertNotNull(resultBV31, "Expected intersections");
+        assertEquals(2, resultBV31.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(-2, 0, 0), new Point(2, 0, 4)), resultBV31, "Crosses through rims");
+
+        // **** Group 4: Ray starts exactly on the cylinder
+        // BV41: Ray starts exactly at the center of the bottom base and goes out the top base (1 point)
+        List<Point> resultBV41 = CYLINDER.findIntersections(new Ray(new Point(0, 0, 0), new Vector(0, 0, 1)));
+        assertNotNull(resultBV41, "Expected intersections");
+        assertEquals(1, resultBV41.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(0, 0, 4)), resultBV41, "Starts bottom center goes up");
+
+        // BV42: Ray starts exactly on the side surface and goes strictly inside (1 point)
+        List<Point> resultBV42 = CYLINDER.findIntersections(new Ray(new Point(-2, 0, 2), new Vector(1, 0, 0)));
+        assertNotNull(resultBV42, "Expected intersections");
+        assertEquals(1, resultBV42.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(2, 0, 2)), resultBV42, "Starts side surface goes in");
+
+        // BV43: Ray starts exactly on the bottom base, going strictly inside (1 point)
+        List<Point> resultBV43 = CYLINDER.findIntersections(new Ray(new Point(1, 0, 0), new Vector(0, 0, 1)));
+        assertNotNull(resultBV43, "Expected intersections");
+        assertEquals(1, resultBV43.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(1, 0, 4)), resultBV43, "Starts bottom base goes up");
     }
 }

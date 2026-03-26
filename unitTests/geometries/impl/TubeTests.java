@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * Unit tests for {@link geometries.impl.Tube} class.
  */
 class TubeTests {
-
     /**
      * Test method for {@link geometries.impl.Tube#getNormal(primitives.Point)}.
      */
@@ -37,39 +36,89 @@ class TubeTests {
                 "ERROR: getNormal() wrong result for a point exactly opposite the ray's head");
     }
 
+    private static final double RADIUS = 2d;
+    private static final Ray AXIS = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
+    private static final Tube TUBE = new Tube(RADIUS, AXIS);
     /**
      * Test method for {@link geometries.impl.Tube#findIntersections(primitives.Ray)}.
      */
     @Test
     void testFindIntersections() {
-        Tube tube = new Tube(1d, new Ray(new Point(0, 0, 0), new Vector(0, 0, 1)));
-
         // ============ Equivalence Partitions Tests ==============
-        // EP01: Ray crosses tube (2 points)
-        List<Point> result01 = tube.findIntersections(new Ray(new Point(-2, 0, 0.5), new Vector(1, 0, 0)));
-        assertNotNull(result01, "Wrong tube intersection");
-        assertEquals(2, result01.size(), "Wrong number of points");
+        // EP01: Ray crosses the tube side-to-side (orthogonal) (2 points)
+        List<Point> resultEP01 = TUBE.findIntersections(new Ray(new Point(-4, 0, 1), new Vector(1, 0, 0)));
+        assertNotNull(resultEP01, "Expected intersections");
+        assertEquals(2, resultEP01.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(-2, 0, 1), new Point(2, 0, 1)), resultEP01, "Orthogonal cross");
 
-        // EP02: Ray outside tube and parallel to axis (0 points)
-        assertNull(tube.findIntersections(new Ray(new Point(2, 0, 0), new Vector(0, 0, 1))),
-                "Ray parallel outside tube");
+        // EP02: Ray crosses the tube (acute angle to axis) (2 points)
+        List<Point> resultEP02 = TUBE.findIntersections(new Ray(new Point(-4, 0, 0), new Vector(1, 0, 1)));
+        assertNotNull(resultEP02, "Expected intersections");
+        assertEquals(2, resultEP02.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(-2, 0, 2), new Point(2, 0, 6)), resultEP02, "Acute cross");
 
-        // EP03: Ray strictly inside tube and parallel to axis (0 points)
-        assertNull(tube.findIntersections(new Ray(new Point(0.5, 0, 0), new Vector(0, 0, 1))),
-                "Ray parallel inside tube");
+        // EP03: Ray completely misses the tube (skew line) (0 points)
+        assertNull(TUBE.findIntersections(new Ray(new Point(3, 0, 0), new Vector(0, 1, 1))),
+                "Skew line outside tube");
 
         // =============== Boundary Values Tests ==================
-        // BV01: Ray is tangent to the tube (0 points)
-        assertNull(tube.findIntersections(new Ray(new Point(1, -1, 0), new Vector(0, 1, 0))),
-                "Ray tangent to tube");
 
-        // BV02: Ray originates on the surface and goes outside (0 points)
-        assertNull(tube.findIntersections(new Ray(new Point(1, 0, 0), new Vector(1, 0, 0))),
-                "Ray starting on surface going outside");
+        // **** Group 1: Ray is parallel to the tube's axis
+        // BV11: Ray is parallel and strictly inside the tube (0 points)
+        assertNull(TUBE.findIntersections(new Ray(new Point(1, 0, 0), new Vector(0, 0, 1))),
+                "Parallel ray inside tube");
 
-        // BV03: Ray crosses the central axis (2 points)
-        List<Point> result03 = tube.findIntersections(new Ray(new Point(-2, 0, 0), new Vector(1, 0, 0)));
-        assertNotNull(result03, "Wrong tube intersection");
-        assertEquals(2, result03.size(), "Ray crossing axis must yield 2 points");
+        // BV12: Ray is parallel and strictly outside the tube (0 points)
+        assertNull(TUBE.findIntersections(new Ray(new Point(3, 0, 0), new Vector(0, 0, 1))),
+                "Parallel ray outside tube");
+
+        // BV13: Ray is parallel and lies exactly on the tube's surface (0 points)
+        assertNull(TUBE.findIntersections(new Ray(new Point(2, 0, 0), new Vector(0, 0, 1))),
+                "Parallel ray on tube surface");
+
+        // **** Group 2: Ray is orthogonal to the tube's axis
+        // BV21: Ray starts exactly on the axis (1 point)
+        List<Point> resultBV21 = TUBE.findIntersections(new Ray(new Point(0, 0, 2), new Vector(1, 0, 0)));
+        assertNotNull(resultBV21, "Expected intersections");
+        assertEquals(1, resultBV21.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(2, 0, 2)), resultBV21, "Starts on axis orthogonal");
+
+        // BV22: Ray starts strictly inside the tube, not on axis (1 point)
+        List<Point> resultBV22 = TUBE.findIntersections(new Ray(new Point(1, 0, 2), new Vector(1, 0, 0)));
+        assertNotNull(resultBV22, "Expected intersections");
+        assertEquals(1, resultBV22.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(2, 0, 2)), resultBV22, "Starts inside orthogonal");
+
+        // BV23: Ray starts on the surface and goes inside (1 point)
+        List<Point> resultBV23 = TUBE.findIntersections(new Ray(new Point(-2, 0, 2), new Vector(1, 0, 0)));
+        assertNotNull(resultBV23, "Expected intersections");
+        assertEquals(1, resultBV23.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(2, 0, 2)), resultBV23, "Starts on surface goes inside orthogonal");
+
+        // BV24: Ray starts on the surface and goes outside (0 points)
+        assertNull(TUBE.findIntersections(new Ray(new Point(2, 0, 2), new Vector(1, 0, 0))),
+                "Starts on surface goes outside orthogonal");
+
+        // BV25: Ray is tangent to the tube (0 points)
+        assertNull(TUBE.findIntersections(new Ray(new Point(2, -2, 2), new Vector(0, 1, 0))),
+                "Tangent orthogonal ray");
+
+        // **** Group 3: Ray intersects the axis (not orthogonal, not parallel)
+        // BV31: Ray starts exactly on the axis (1 point)
+        List<Point> resultBV31 = TUBE.findIntersections(new Ray(new Point(0, 0, 0), new Vector(1, 0, 1)));
+        assertNotNull(resultBV31, "Expected intersections");
+        assertEquals(1, resultBV31.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(2, 0, 2)), resultBV31, "Starts on axis angled");
+
+        // BV32: Ray starts before the tube and passes through the axis (2 points)
+        List<Point> resultBV32 = TUBE.findIntersections(new Ray(new Point(-4, 0, -4), new Vector(1, 0, 1)));
+        assertNotNull(resultBV32, "Expected intersections");
+        assertEquals(2, resultBV32.size(), "Wrong number of points");
+        assertEquals(List.of(new Point(-2, 0, -2), new Point(2, 0, 2)), resultBV32, "Passes through axis angled");
+
+        // **** Group 4: Tangent rays (not orthogonal)
+        // BV41: Ray is tangent to the tube at an angle (0 points)
+        assertNull(TUBE.findIntersections(new Ray(new Point(2, -2, 0), new Vector(0, 1, 1))),
+                "Tangent angled ray");
     }
 }
