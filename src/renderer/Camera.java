@@ -3,8 +3,8 @@ package renderer;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+
 import java.util.MissingResourceException;
-import static primitives.Util.isZero;
 
 /**
  * Represents a camera in 3D space.
@@ -15,51 +15,79 @@ import static primitives.Util.isZero;
  */
 public class Camera implements Cloneable {
 
-    /** The origin (position) point of the camera. */
+    /**
+     * The origin (position) point of the camera.
+     */
     private Point _p0;
 
-    /** Directional vector pointing to the right of the camera. */
+    /**
+     * Directional vector pointing to the right of the camera.
+     */
     private Vector _vRight;
 
-    /** Directional vector pointing upwards from the camera. */
+    /**
+     * Directional vector pointing upwards from the camera.
+     */
     private Vector _vUp;
 
-    /** Directional vector pointing forward (target direction). */
+    /**
+     * Directional vector pointing forward (target direction).
+     */
     private Vector _vTo;
 
-    /** The physical width of the View Plane. */
+    /**
+     * The physical width of the View Plane.
+     */
     private double _width;
 
-    /** The physical height of the View Plane. */
+    /**
+     * The physical height of the View Plane.
+     */
     private double _height;
 
-    /** The focal distance between the camera and the View Plane. */
+    /**
+     * The focal distance between the camera and the View Plane.
+     */
     private double _distance;
 
-    /** Number of columns (horizontal resolution) of the View Plane grid. */
+    /**
+     * Number of columns (horizontal resolution) of the View Plane grid.
+     */
     private int _nX = 1;
 
-    /** Number of rows (vertical resolution) of the View Plane grid. */
+    /**
+     * Number of rows (vertical resolution) of the View Plane grid.
+     */
     private int _nY = 1;
 
     // --- Calculated fields ---
 
-    /** The center point of the View Plane. */
+    /**
+     * The center point of the View Plane.
+     */
     private Point _pCenter;
 
-    /** The physical width of a single pixel. */
+    /**
+     * The physical width of a single pixel.
+     */
     private double _rx;
 
-    /** The physical height of a single pixel. */
+    /**
+     * The physical height of a single pixel.
+     */
     private double _ry;
 
-    /** * Private default constructor.
+    /**
+     * Private default constructor.
      * Camera instantiation must be done via the {@link Builder}.
      */
-    private Camera() {}
+    private Camera() {
+    }
 
-    /** * Provides a new instance of the camera builder.
-     * * @return A new {@link Builder} instance.
+    /**
+     * Provides a new instance of the camera builder.
+     *
+     * @return A new {@link Builder} instance.
      */
     public static Builder getBuilder() {
         return new Builder();
@@ -67,19 +95,26 @@ public class Camera implements Cloneable {
 
     /**
      * Retrieves the horizontal resolution.
-     * * @return The number of columns of the View Plane grid.
+     *
+     * @return The number of columns of the View Plane grid.
      */
-    public int getNx() { return _nX; }
+    public int getNx() {
+        return _nX;
+    }
 
     /**
      * Retrieves the vertical resolution.
-     * * @return The number of rows of the View Plane grid.
+     *
+     * @return The number of rows of the View Plane grid.
      */
-    public int getNy() { return _nY; }
+    public int getNy() {
+        return _nY;
+    }
 
     /**
      * Constructs a ray originating from the camera and passing through the center
      * of a specific pixel on the viewing plane.
+     *
      * @param xIndex The column index of the pixel (X-axis, left to right)
      * @param yIndex The row index of the pixel (Y-axis, top to bottom)
      * @return The geometric {@link Ray} passing through the center of the pixel.
@@ -104,7 +139,8 @@ public class Camera implements Cloneable {
 
     /**
      * Creates and returns an exact copy of this camera instance.
-     * * @return A clone of the Camera object.
+     *
+     * @return A clone of the Camera object.
      * @throws CloneNotSupportedException If cloning fails.
      */
     @Override
@@ -118,16 +154,24 @@ public class Camera implements Cloneable {
      */
     public static class Builder {
 
-        /** The camera instance currently under construction. */
+        /**
+         * The camera instance currently under construction.
+         */
         private final Camera _camera;
 
-        /** Temporary target point used to define the direction. */
+        /**
+         * Temporary target point used to define the direction.
+         */
         private Point _target = null;
 
-        /** Temporary explicit 'Up' vector. */
+        /**
+         * Temporary explicit 'Up' vector.
+         */
         private Vector _explicitUp = null;
 
-        /** Temporary explicit 'To' vector. */
+        /**
+         * Temporary explicit 'To' vector.
+         */
         private Vector _explicitTo = null;
 
         /**
@@ -139,7 +183,8 @@ public class Camera implements Cloneable {
 
         /**
          * Sets the position (origin) of the camera.
-         * * @param location The origin point of the camera.
+         *
+         * @param location The origin point of the camera.
          * @return The current Builder instance for chaining.
          */
         public Builder setLocation(Point location) {
@@ -150,7 +195,8 @@ public class Camera implements Cloneable {
         /**
          * Sets the camera's direction using two vectors.
          * The vectors must be orthogonal.
-         * * @param to The vector pointing forward.
+         *
+         * @param to The vector pointing forward.
          * @param up The vector pointing upwards.
          * @return The current Builder instance for chaining.
          */
@@ -162,7 +208,8 @@ public class Camera implements Cloneable {
 
         /**
          * Sets the camera's direction towards a target point with an explicit 'up' vector.
-         * * @param target The geometric point the camera should look at.
+         *
+         * @param target The geometric point the camera should look at.
          * @param up     The vector indicating the "up" direction.
          * @return The current Builder instance for chaining.
          */
@@ -174,7 +221,8 @@ public class Camera implements Cloneable {
 
         /**
          * Sets the camera's direction towards a target point (the default 'up' will be the Y-axis).
-         * * @param target The geometric point the camera should look at.
+         *
+         * @param target The geometric point the camera should look at.
          * @return The current Builder instance for chaining.
          */
         public Builder setDirection(Point target) {
@@ -184,7 +232,8 @@ public class Camera implements Cloneable {
 
         /**
          * Sets the physical dimensions of the View Plane.
-         * * @param width  The physical width of the View Plane.
+         *
+         * @param width  The physical width of the View Plane.
          * @param height The physical height of the View Plane.
          * @return The current Builder instance for chaining.
          */
@@ -196,7 +245,8 @@ public class Camera implements Cloneable {
 
         /**
          * Sets the distance between the camera and its View Plane.
-         * * @param distance The focal distance.
+         *
+         * @param distance The focal distance.
          * @return The current Builder instance for chaining.
          */
         public Builder setVpDistance(double distance) {
@@ -206,7 +256,8 @@ public class Camera implements Cloneable {
 
         /**
          * Sets the pixel resolution of the final image.
-         * * @param nX Number of columns (horizontal resolution).
+         *
+         * @param nX Number of columns (horizontal resolution).
          * @param nY Number of rows (vertical resolution).
          * @return The current Builder instance for chaining.
          */
@@ -219,7 +270,8 @@ public class Camera implements Cloneable {
         /**
          * Verifies the validity of all injected data, performs necessary calculations
          * (orthogonality, pixel sizes), and returns the final camera.
-         * * @return A valid and cloned {@link Camera} instance.
+         *
+         * @return A valid and cloned {@link Camera} instance.
          * @throws MissingResourceException If a critical parameter (position, direction) is missing.
          * @throws IllegalArgumentException If geometric data is invalid (negative values, non-orthogonal vectors).
          */
@@ -234,14 +286,18 @@ public class Camera implements Cloneable {
             }
         }
 
-        /** Verifies that the resolution is strictly positive. */
+        /**
+         * Verifies that the resolution is strictly positive.
+         */
         private void checkResolution() {
             if (_camera._nX <= 0 || _camera._nY <= 0) {
                 throw new IllegalArgumentException("Resolution must be strictly positive.");
             }
         }
 
-        /** Calculates and verifies the orthogonality of the camera's coordinate system (vTo, vUp, vRight). */
+        /**
+         * Calculates and verifies the orthogonality of the camera's coordinate system (vTo, vUp, vRight).
+         */
         private void checkLocationAndDirection() {
             if (_camera._p0 == null) {
                 throw new MissingResourceException("The camera's center (location) is missing", "Camera", "_p0");
@@ -272,7 +328,9 @@ public class Camera implements Cloneable {
             _camera._vUp = _camera._vRight.crossProduct(_camera._vTo).normalize();
         }
 
-        /** Verifies the View Plane dimensions and pre-calculates the center and pixel sizes. */
+        /**
+         * Verifies the View Plane dimensions and pre-calculates the center and pixel sizes.
+         */
         private void checkViewPlane() {
             if (_camera._width <= 0 || _camera._height <= 0) {
                 throw new IllegalArgumentException("View Plane dimensions must be strictly positive.");

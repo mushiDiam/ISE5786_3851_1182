@@ -1,17 +1,16 @@
 package renderer;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.MissingResourceException;
-
 import org.junit.jupiter.api.Test;
-
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 import renderer.Camera.Builder;
+
+import java.util.MissingResourceException;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for class {@link Camera}.
@@ -25,38 +24,59 @@ import renderer.Camera.Builder;
  */
 class CameraTests {
 
-    /** Default constructor to satisfy documentation tools. */
+    /**
+     * Default constructor to satisfy documentation tools.
+     */
     CameraTests() { /* Default constructor to satisfy documentation tools */ }
 
-    /** Camera location used in ray construction tests. */
-    private static final Point  LOCATION               = Point.ZERO;
+    /**
+     * Camera location used in ray construction tests.
+     */
+    private static final Point LOCATION = Point.ZERO;
 
-    /** Forward direction used in tests. */
-    private static final Vector V_TO                   = new Vector(0, 0, -5);
+    /**
+     * Forward direction used in tests.
+     */
+    private static final Vector V_TO = new Vector(0, 0, -5);
 
-    /** Up direction used in tests. */
-    private static final Vector V_UP                   = new Vector(0, 2, 0);
+    /**
+     * Up direction used in tests.
+     */
+    private static final Vector V_UP = new Vector(0, 2, 0);
 
-    /** Target point used in tests. */
-    private static final Point  TARGET                 = new Point(0, 0, -5);
+    /**
+     * Target point used in tests.
+     */
+    private static final Point TARGET = new Point(0, 0, -5);
 
-    /** Default view-plane distance used in tests. */
-    private static final double VP_DISTANCE            = 10d;
+    /**
+     * Default view-plane distance used in tests.
+     */
+    private static final double VP_DISTANCE = 10d;
 
-    /** Error message for invalid ray construction. */
-    private static final String ERROR_CONSTRUCT_RAY    = "constructRay() result is incorrect";
+    /**
+     * Error message for invalid ray construction.
+     */
+    private static final String ERROR_CONSTRUCT_RAY = "constructRay() result is incorrect";
 
-    /** Error message for unexpected exception in valid build scenario. */
-    private static final String ERROR_VALID_BUILD      = "Valid camera build should not throw an exception";
+    /**
+     * Error message for unexpected exception in valid build scenario.
+     */
+    private static final String ERROR_VALID_BUILD = "Valid camera build should not throw an exception";
 
-    /** Error message for missing resource in camera build. */
+    /**
+     * Error message for missing resource in camera build.
+     */
     private static final String ERROR_MISSING_RESOURCE = "Expected MissingResourceException was not thrown";
 
-    /** Error message for invalid argument in camera build. */
+    /**
+     * Error message for invalid argument in camera build.
+     */
     private static final String ERROR_INVALID_ARGUMENT = "Expected IllegalArgumentException was not thrown";
 
     /**
      * Creates a basic builder with valid location and view-plane distance.
+     *
      * @return initialized camera builder
      */
     private Camera.Builder baseBuilder() {
@@ -204,13 +224,13 @@ class CameraTests {
      */
     @Test
     void testConstructRay() {
-        Camera camera4x4ByVectors     = baseBuilder()
+        Camera camera4x4ByVectors = baseBuilder()
                 .setVpSize(8, 8)
                 .setResolution(4, 4)
                 .setDirection(V_TO, V_UP)
                 .build();
 
-        Camera camera4x4ByTarget      = baseBuilder()
+        Camera camera4x4ByTarget = baseBuilder()
                 .setVpSize(8, 8)
                 .setResolution(4, 4)
                 .setDirection(TARGET)
@@ -222,7 +242,7 @@ class CameraTests {
                 .setDirection(TARGET, V_UP)
                 .build();
 
-        Camera camera3x3              = baseBuilder()
+        Camera camera3x3 = baseBuilder()
                 .setDirection(V_TO, V_UP)
                 .setVpSize(6, 6)
                 .setResolution(3, 3)
@@ -232,7 +252,7 @@ class CameraTests {
 
         // EP01: Construct ray through an interior pixel in a 4x4 view plane using
         // setDirection(Vector, Vector)
-        Ray    rayEP01                = camera4x4ByVectors.constructRay(1, 1);
+        Ray rayEP01 = camera4x4ByVectors.constructRay(1, 1);
         assertEquals(new Ray(LOCATION, new Vector(-1, 1, -10)), rayEP01, ERROR_CONSTRUCT_RAY);
 
         // EP02: Construct ray through an interior pixel in a 4x4 view plane using
