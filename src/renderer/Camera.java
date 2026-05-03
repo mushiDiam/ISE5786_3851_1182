@@ -1,8 +1,10 @@
 package renderer;
 
+import primitives.Color;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
+import scene.Scene;
 
 import java.util.MissingResourceException;
 
@@ -77,6 +79,18 @@ public class Camera implements Cloneable {
      */
     private double _ry;
 
+    // --- Rendering fields ---
+
+    /**
+     * The image writer used to create the image file.
+     */
+    private ImageWriter _imageWriter;
+
+    /**
+     * The ray tracer used to calculate colors in the scene.
+     */
+    private RayTracerBase _rayTracer;
+
     /**
      * Private default constructor.
      * Camera instantiation must be done via the {@link Builder}.
@@ -122,8 +136,6 @@ public class Camera implements Cloneable {
     public Ray constructRay(int xIndex, int yIndex) {
         Point pIJ = _pCenter;
 
-        // Calculating offsets relative to the center of the View Plane
-        // We use the camera's internal fields _nX and _nY
         double xJ = (xIndex - (_nX - 1) / 2d) * _rx;
         double yI = -(yIndex - (_nY - 1) / 2d) * _ry;
 
@@ -135,6 +147,59 @@ public class Camera implements Cloneable {
         }
 
         return new Ray(_p0, pIJ.subtract(_p0));
+    }
+
+    /**
+     * Renders the image by casting rays through every pixel and coloring them.
+     *
+     * @return the current camera instance
+     */
+    public Camera renderImage() {
+        for (int i = 0; i < _nY; i++) {
+            for (int j = 0; j < _nX; j++) {
+                castRay(j, i);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Casts a single ray for a specific pixel and writes its calculated color to the image.
+     *
+     * @param xIndex the pixel's column index
+     * @param yIndex the pixel's row index
+     */
+    private void castRay(int xIndex, int yIndex) {
+        Ray ray = constructRay(xIndex, yIndex);
+        Color color = _rayTracer.traceRay(ray);
+        _imageWriter.writePixel(xIndex, yIndex, color);
+    }
+
+    /**
+     * Prints a grid on the image to help visualize pixel alignment.
+     *
+     * @param interval the gap (in pixels) between grid lines
+     * @param color    the color of the grid lines
+     * @return the current camera instance
+     */
+    public Camera printGrid(int interval, Color color) {
+        for (int i = 0; i < _nY; i++) {
+            for (int j = 0; j < _nX; j++) {
+                if (i % interval == 0 || j % interval == 0) {
+                    _imageWriter.writePixel(j, i, color);
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Delegates the file saving operation to the image writer.
+     *
+     * @param imageName the name of the final image file
+     */
+    public void writeToImage(String imageName) {
+        _imageWriter.writeToImage(imageName);
     }
 
     /**
@@ -268,6 +333,22 @@ public class Camera implements Cloneable {
         }
 
         /**
+         * Injects the desired ray tracer into the camera setup.
+         *
+         * @param scene the scene to be rendered
+         * @param type  the type of ray tracer to use
+         * @return the current builder instance
+         */
+        public Builder setRayTracer(Scene scene, RayTracerType type) {
+            if (type == RayTracerType.SIMPLE) {
+                _camera._rayTracer = new SimpleRayTracer(scene);
+            } else {
+                throw new IllegalArgumentException("Unsupported RayTracerType");
+            }
+            return this;
+        }
+
+        /**
          * Verifies the validity of all injected data, performs necessary calculations
          * (orthogonality, pixel sizes), and returns the final camera.
          *
@@ -279,6 +360,12 @@ public class Camera implements Cloneable {
             checkResolution();
             checkLocationAndDirection();
             checkViewPlane();
+
+            // Default initialization if a ray tracer wasn't specifically provided
+            if (_camera._rayTracer == null) {
+                setRayTracer(new Scene("test"), RayTracerType.SIMPLE);
+            }
+
             try {
                 return (Camera) _camera.clone();
             } catch (CloneNotSupportedException e) {
@@ -287,12 +374,14 @@ public class Camera implements Cloneable {
         }
 
         /**
-         * Verifies that the resolution is strictly positive.
+         * Verifies that the resolution is strictly positive and initializes the image writer.
          */
         private void checkResolution() {
             if (_camera._nX <= 0 || _camera._nY <= 0) {
                 throw new IllegalArgumentException("Resolution must be strictly positive.");
             }
+            // Initialize the ImageWriter based on the validated resolution
+            _camera._imageWriter = new ImageWriter(_camera._nX, _camera._nY);
         }
 
         /**
@@ -306,12 +395,10 @@ public class Camera implements Cloneable {
                 throw new MissingResourceException("The camera's direction is missing", "Camera", "direction");
             }
 
-            // Default initialization if no 'up' vector is provided
             if (_explicitUp == null) {
                 _explicitUp = new Vector(0, 1, 0);
             }
 
-            // Calculation of the direction vector (vTo)
             if (_explicitTo != null) {
                 _camera._vTo = _explicitTo.normalize();
             } else {
@@ -324,7 +411,6 @@ public class Camera implements Cloneable {
                 throw new IllegalArgumentException("The vTo and vUp vectors cannot be parallel.");
             }
 
-            // Recalculation of the true orthogonal up vector
             _camera._vUp = _camera._vRight.crossProduct(_camera._vTo).normalize();
         }
 
@@ -339,7 +425,6 @@ public class Camera implements Cloneable {
                 throw new IllegalArgumentException("The View Plane distance must be strictly positive.");
             }
 
-            // Calculation of convenience fields
             _camera._pCenter = _camera._p0.add(_camera._vTo.scale(_camera._distance));
             _camera._rx = _camera._width / _camera._nX;
             _camera._ry = _camera._height / _camera._nY;
