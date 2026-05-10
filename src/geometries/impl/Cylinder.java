@@ -60,11 +60,13 @@ public class Cylinder extends Tube {
      * and intersections with the two bases.
      *
      * @param ray the ray to intersect with the cylinder
-     * @return a list of intersection points, or null if there are none
+     * @return a list of intersection GeoPoints, or null if there are none
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
-        List<Point> tubeIntersections = super.findIntersections(ray);
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        // CRITICAL FIX: Call the helper method of the superclass (Tube) per instructions
+        List<GeoPoint> tubeIntersections = super.findGeoIntersectionsHelper(ray);
+
         Point p0 = ray.origin();
         Vector v = ray.direction();
         Point pa1 = _axis.origin();
@@ -76,7 +78,9 @@ public class Cylinder extends Tube {
 
         // 1. Check side intersections from Tube (STRICTLY bounded by height)
         if (tubeIntersections != null) {
-            for (Point p : tubeIntersections) {
+            for (GeoPoint gp : tubeIntersections) {
+                Point p = gp.point; // Extract the actual point from the GeoPoint
+
                 double tAxis = 0;
                 if (!p.equals(pa1)) {
                     tAxis = primitives.Util.alignZero(va.dotProduct(p.subtract(pa1)));
@@ -144,7 +148,7 @@ public class Cylinder extends Tube {
 
         // 3. Final return
         if (count == 1) {
-            return List.of(ray.getPoint(t1));
+            return List.of(new GeoPoint(this, ray.getPoint(t1)));
         } else if (count == 2) {
             return createSortedList(ray, t1, t2);
         }
@@ -153,12 +157,12 @@ public class Cylinder extends Tube {
     }
 
     /**
-     * Helper method to return a sorted list of points based on t1 and t2.
+     * Helper method to return a sorted list of GeoPoints based on t1 and t2.
      */
-    private List<Point> createSortedList(Ray ray, double tA, double tB) {
+    private List<GeoPoint> createSortedList(Ray ray, double tA, double tB) {
         if (tA < tB) {
-            return List.of(ray.getPoint(tA), ray.getPoint(tB));
+            return List.of(new GeoPoint(this, ray.getPoint(tA)), new GeoPoint(this, ray.getPoint(tB)));
         }
-        return List.of(ray.getPoint(tB), ray.getPoint(tA));
+        return List.of(new GeoPoint(this, ray.getPoint(tB)), new GeoPoint(this, ray.getPoint(tA)));
     }
 }

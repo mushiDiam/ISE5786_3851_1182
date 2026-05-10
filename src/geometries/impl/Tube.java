@@ -53,7 +53,7 @@ public class Tube extends RadialGeometry {
      * Finds intersections between a ray and the infinite tube.
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         Point p0 = ray.origin();
         Vector v = ray.direction();
         Point pa = _axis.origin();
@@ -113,13 +113,13 @@ public class Tube extends RadialGeometry {
         double t2 = primitives.Util.alignZero((-b + sqrtDiscr) / (2 * a));
 
         if (t1 > 0 && t2 > 0) {
-            return List.of(ray.getPoint(t1), ray.getPoint(t2));
+            return List.of(new GeoPoint(this, ray.getPoint(t1)), new GeoPoint(this, ray.getPoint(t2)));
         }
         if (t1 > 0) {
-            return List.of(ray.getPoint(t1));
+            return List.of(new GeoPoint(this, ray.getPoint(t1)));
         }
         if (t2 > 0) {
-            return List.of(ray.getPoint(t2));
+            return List.of(new GeoPoint(this, ray.getPoint(t2)));
         }
 
         return null;

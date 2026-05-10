@@ -31,9 +31,9 @@ public final class Plane extends Geometry {
      */
     public Plane(Point p1, Point p2, Point p3) {
         _point = p1;
-         Vector v1 = p2.subtract(p1);
-         Vector v2 = p3.subtract(p1);
-         _normal = v1.crossProduct(v2).normalize();
+        Vector v1 = p2.subtract(p1);
+        Vector v2 = p3.subtract(p1);
+        _normal = v1.crossProduct(v2).normalize();
     }
 
     /**
@@ -60,34 +60,29 @@ public final class Plane extends Geometry {
 
     /**
      * Finds intersections between a ray and the plane.
-     * * @param ray the ray to intersect with the plane
+     *
+     * @param ray the ray to intersect with the plane
      * @return a list of intersection points, or null if there are none
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         Point p0 = ray.origin();
         Vector v = ray.direction();
         Vector n = _normal;
 
-        // Ensure the ray origin is not the same as the plane's reference point
         if (_point.equals(p0)) {
             return null;
         }
 
         double nv = n.dotProduct(v);
-
-        // Ray is parallel to the plane [cite: 47, 48]
         if (primitives.Util.isZero(nv)) {
             return null;
         }
 
         Vector p0ToQ0 = _point.subtract(p0);
         double nQMinusP0 = n.dotProduct(p0ToQ0);
-
-        // Calculate scaling factor t [cite: 49]
         double t = primitives.Util.alignZero(nQMinusP0 / nv);
 
-        // Intersections are only valid in the direction of the ray (t > 0) [cite: 50, 53]
-        return t <= 0 ? null : List.of(ray.getPoint(t));
+        return t <= 0 ? null : List.of(new GeoPoint(this, ray.getPoint(t)));
     }
 }

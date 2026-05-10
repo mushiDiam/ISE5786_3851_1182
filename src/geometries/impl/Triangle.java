@@ -31,9 +31,9 @@ public class Triangle extends Polygon {
      * @return a list containing the intersection point, or null if there is none
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         // First, check if the ray intersects the plane of the triangle
-        List<Point> planeIntersections = _plane.findIntersections(ray);
+        var planeIntersections = _plane.findGeoIntersections(ray);
         if (planeIntersections == null) {
             return null;
         }
@@ -53,13 +53,13 @@ public class Triangle extends Polygon {
         double s2 = primitives.Util.alignZero(v.dotProduct(n2));
         double s3 = primitives.Util.alignZero(v.dotProduct(n3));
 
-        // Intersections exactly on edges or vertices are not included [cite: 53]
         if (s1 == 0 || s2 == 0 || s3 == 0) {
             return null;
         }
 
         if ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
-            return planeIntersections; // The point is inside the triangle
+            // The point is inside the triangle, return it wrapped with 'this' (the Triangle)
+            return List.of(new GeoPoint(this, planeIntersections.get(0).point));
         }
 
         return null;

@@ -1,7 +1,6 @@
 package geometries.impl;
 
 import geometries.api.Intersectable;
-import primitives.Point;
 import primitives.Ray;
 
 import java.util.ArrayList;
@@ -48,29 +47,24 @@ public class Geometries extends Intersectable {
 
     /**
      * Finds intersections between a ray and all geometries in the collection.
-     * * @param ray the ray to test for intersections
+     *
+     * @param ray the ray to test for intersections
      * @return a list of all intersection points, or null if none are found
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
-        // Do not create the list object before the loop
-        List<Point> intersections = null;
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+        List<GeoPoint> intersections = null;
 
-        // Collect intersections from all geometries using delegation
-        for (Intersectable geo : geometries) {
-            List<Point> geoIntersections = geo.findIntersections(ray);
-
-            // Only create the list object when an item returns a non-null list
+        for (Intersectable geometry : geometries) { // Assuming your list is named 'geometries'
+            // Use the public NVI method to get intersections
+            var geoIntersections = geometry.findGeoIntersections(ray);
             if (geoIntersections != null) {
                 if (intersections == null) {
-                    intersections = new ArrayList<>();
+                    intersections = new java.util.LinkedList<>();
                 }
-                // Add to the created list
                 intersections.addAll(geoIntersections);
             }
         }
-
-        // Return null if no intersections were found, not an empty list
         return intersections;
     }
 }

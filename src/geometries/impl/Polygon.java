@@ -50,7 +50,7 @@ public class Polygon extends Geometry {
      *
      * @param vertices polygon vertices in edge order
      * @throws IllegalArgumentException if the vertices do not form a valid convex
-     * polygon
+     *                                  polygon
      */
     public Polygon(Point... vertices) {
         if (vertices.length < 3)
@@ -103,9 +103,9 @@ public class Polygon extends Geometry {
      * @return a list containing the intersection point, or null if there is none
      */
     @Override
-    public List<Point> findIntersections(Ray ray) {
+    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
         // First, check if the ray intersects the plane of the polygon
-        List<Point> planeIntersections = _plane.findIntersections(ray);
+        var planeIntersections = _plane.findGeoIntersections(ray);
         if (planeIntersections == null) {
             return null;
         }
@@ -113,31 +113,28 @@ public class Polygon extends Geometry {
         Point p0 = ray.origin();
         Vector v = ray.direction();
 
-        // Calculate the sign of the first cross product
         Vector v1 = _vertices.get(0).subtract(p0);
         Vector v2 = _vertices.get(1).subtract(p0);
         double sign = primitives.Util.alignZero(v.dotProduct(v1.crossProduct(v2)));
 
         if (sign == 0) {
-            return null; // On edge or vertex
+            return null;
         }
 
         boolean positive = sign > 0;
-
-        // Verify the sign remains the same for all consecutive vertices
         for (int i = 1; i < _vertices.size(); i++) {
             v1 = v2;
             v2 = _vertices.get((i + 1) % _vertices.size()).subtract(p0);
-
             double currentSign = primitives.Util.alignZero(v.dotProduct(v1.crossProduct(v2)));
+
             if (currentSign == 0) {
-                return null; // On edge or vertex
+                return null;
             }
             if ((currentSign > 0) != positive) {
-                return null; // Point is outside the polygon
+                return null;
             }
         }
 
-        return planeIntersections;
+        return List.of(new GeoPoint(this, planeIntersections.get(0).point));
     }
 }
