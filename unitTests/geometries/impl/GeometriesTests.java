@@ -1,9 +1,5 @@
-package geometries.tests;
+package geometries.impl;
 
-import geometries.impl.Geometries;
-import geometries.impl.Plane;
-import geometries.impl.Sphere;
-import geometries.impl.Triangle;
 import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Ray;
@@ -11,7 +7,9 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link geometries.impl.Geometries} class.

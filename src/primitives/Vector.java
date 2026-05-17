@@ -1,5 +1,17 @@
 package primitives;
 
+/**
+ * Represents a three-dimensional mathematical vector.
+ * <p>
+ * A {@code Vector} is defined by its coordinates in 3D space and supports common
+ * vector operations such as addition, scaling, dot product, cross product,
+ * length calculation, and normalization.
+ * </p>
+ * <p>
+ * The zero vector {@code (0, 0, 0)} is not allowed, since it has no direction
+ * and cannot be normalized.
+ * </p>
+ */
 public final class Vector extends Point {
 
     public static final Vector AXIS_X = new Vector(1, 0, 0);

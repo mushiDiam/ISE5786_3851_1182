@@ -1,18 +1,17 @@
 package renderer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.List;
-import org.junit.jupiter.api.Test;
-
 import geometries.api.Intersectable;
 import geometries.impl.Plane;
 import geometries.impl.Sphere;
 import geometries.impl.Triangle;
+import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
-import renderer.Camera;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Integration tests for {@link Camera} ray construction and {@link Intersectable} geometries.
@@ -140,5 +139,9 @@ class CameraIntersectionIntegrationTests {
         // TC02: Large triangle (2 intersections)
         assertIntersectionsCount("TC02: Large triangle", camera,
                 new Triangle(new Point(0, 20, -2), new Point(1, -1, -2), new Point(-1, -1, -2)), 2);
+    }
+
+    static class DirectionalLightTests {
+
     }
 }

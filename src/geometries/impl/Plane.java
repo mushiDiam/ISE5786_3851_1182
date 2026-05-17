@@ -65,7 +65,7 @@ public final class Plane extends Geometry {
      * @return a list of intersection points, or null if there are none
      */
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         Point p0 = ray.origin();
         Vector v = ray.direction();
         Vector n = _normal;
@@ -83,6 +83,6 @@ public final class Plane extends Geometry {
         double nQMinusP0 = n.dotProduct(p0ToQ0);
         double t = primitives.Util.alignZero(nQMinusP0 / nv);
 
-        return t <= 0 ? null : List.of(new GeoPoint(this, ray.getPoint(t)));
+        return t <= 0 ? null : List.of(new Intersection(this, ray.getPoint(t)));
     }
 }

@@ -1,6 +1,6 @@
 package primitives;
 
-import geometries.api.Intersectable.GeoPoint;
+import geometries.api.Intersectable.Intersection;
 
 import java.util.List;
 import java.util.Objects;
@@ -59,45 +59,35 @@ public final class Ray {
 
     /**
      * Finds the closest point to the ray's origin from a given list of points.
+     * Uses a stream to wrap points into Intersections and calls findClosestIntersection.
      *
      * @param points list of intersection points
      * @return the closest point, or null if the list is empty/null
      */
     public Point findClosestPoint(List<Point> points) {
-        if (points == null || points.isEmpty()) {
-            return null;
-        }
-
-        Point closestPoint = null;
-        double minDistance = Double.POSITIVE_INFINITY;
-
-        for (Point point : points) {
-            // we use square distance for speed purposes
-            double distance = point.distanceSquared(_origin);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestPoint = point;
-            }
-        }
-
-        return closestPoint;
+        return points == null || points.isEmpty() ? null
+                : findClosestIntersection(
+                points.stream()
+                        .map(point -> new Intersection(null, point))
+                        .toList()
+        ).point;
     }
 
     /**
-     * Finds the closest GeoPoint to the ray's origin from a given list of GeoPoints.
+     * Finds the closest Intersection to the ray's origin from a given list of Intersections.
      *
-     * @param intersections list of intersection GeoPoints
-     * @return the closest GeoPoint, or null if the list is empty/null
+     * @param intersections list of Intersections
+     * @return the closest Intersection, or null if the list is empty/null
      */
-    public GeoPoint findClosestGeoPoint(List<GeoPoint> intersections) { // <-- Notice Intersectable. is gone
+    public Intersection findClosestIntersection(List<Intersection> intersections) {
         if (intersections == null || intersections.isEmpty()) {
             return null;
         }
 
-        GeoPoint closestPoint = null;
+        Intersection closestPoint = null;
         double minDistance = Double.POSITIVE_INFINITY;
 
-        for (GeoPoint geo : intersections) {
+        for (Intersection geo : intersections) {
             // Calculate squared distance to avoid expensive square root operations
             double distance = geo.point.distanceSquared(_origin);
             if (distance < minDistance) {

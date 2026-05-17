@@ -1,80 +1,119 @@
 package renderer;
 
-import geometries.api.Intersectable.GeoPoint;
+import geometries.api.Intersectable.Intersection;
 import lighting.LightSource;
-import primitives.*;
+import primitives.Color;
+import primitives.Double3;
+import primitives.Ray;
 import scene.Scene;
-
-import java.util.List;
-
-import static primitives.Util.alignZero;
 
 /**
  * A simple ray tracer implementing the Phong reflection model.
+ * <p>
+ * For each primary ray:
+ * <ol>
+ *   <li>Find the closest intersection with any geometry in the scene.</li>
+ *   <li>Compute ambient light (scaled by the material's kA) plus emission.</li>
+ *   <li>For each light source, add diffuse and specular contributions
+ *       (only when the light and camera are on the same side of the surface).</li>
+ * </ol>
  */
 class SimpleRayTracer extends RayTracerBase {
 
-    public SimpleRayTracer(Scene scene) {
+    /**
+     * Constructs a SimpleRayTracer for the given scene.
+     *
+     * @param scene the scene to render
+     */
+    SimpleRayTracer(Scene scene) {
         super(scene);
     }
 
+    // ──────────────────────────────────────────────────────────────────────────
+    //  Ray tracing entry point
+    // ──────────────────────────────────────────────────────────────────────────
+
     @Override
     Color traceRay(Ray ray) {
-        List<GeoPoint> intersections = _scene.geometries.findGeoIntersections(ray);
-        if (intersections == null || intersections.isEmpty())
-            return _scene.background;
+        var intersections = _scene.geometries.calcIntersections(ray);
+        if (intersections == null) return _scene.background;
 
-        GeoPoint closestPoint = ray.findClosestGeoPoint(intersections);
-
-        if (!preprocessIntersection(closestPoint, ray.direction())) {
-            return _scene.ambientLight.getIntensity().scale(closestPoint.geometry.getMaterial().kA)
-                    .add(closestPoint.geometry.getEmission());
-        }
-
-        return calcColor(closestPoint, ray);
+        Intersection closest = ray.findClosestIntersection(intersections);
+        return calcColor(closest, ray);
     }
 
-    private Color calcColor(GeoPoint gp, Ray ray) {
-        return _scene.ambientLight.getIntensity()
-                .scale(gp.geometry.getMaterial().kA)
-                .add(calcLocalEffects(gp)); // Plus besoin de passer "ray", gp contient "v"
+    // ──────────────────────────────────────────────────────────────────────────
+    //  Color computation
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Computes the full color at an intersection point using the Phong model.
+     * Color = (kA × ambient) + emission + localEffects
+     *
+     * @param gp  the closest intersection
+     * @param ray the primary camera ray
+     * @return the computed color at this point
+     */
+    private Color calcColor(Intersection gp, Ray ray) {
+        Color base = _scene.ambientLight.getIntensity()
+                .scale(gp.material.kA)
+                .add(gp.geometry.getEmission());
+
+        // If the ray grazes the surface (n·v == 0), skip local lighting
+        if (!preprocessIntersection(gp, ray.direction())) return base;
+
+        return base.add(calcColorLocalEffects(gp));
     }
 
-    private Color calcLocalEffects(GeoPoint gp) {
-        Color color = gp.geometry.getEmission();
-        Material material = gp.geometry.getMaterial();
+    /**
+     * Computes the sum of all local light-source contributions (diffuse + specular)
+     * at the given intersection using the Phong reflection model.
+     *
+     * @param intersection the pre-processed intersection (n, v, vn must be set)
+     * @return the total local color contribution
+     */
+    private Color calcColorLocalEffects(Intersection intersection) {
+        Color color = Color.BLACK;
 
         for (LightSource lightSource : _scene.lights) {
-            // Utilisation du cache pour la source de lumière
-            if (preprocessLightSource(gp, lightSource)) {
-                Vector l = lightSource.getL(gp.point);
-                double nl = primitives.Util.alignZero(gp.n.dotProduct(l));
+            // Skip this light if it is on the opposite side of the surface
+            if (!preprocessLightSource(intersection, lightSource)) continue;
 
-                Color iL = lightSource.getIntensity(gp.point);
-                color = color.add(
-                        iL.scale(calcDiffuse(material, nl)
-                                .add(calcSpecular(material, gp.n, l, nl, gp.v)))
-                );
-            }
+            color = color.add(
+                    intersection.iL.scale(
+                            calcDiffuse(intersection).add(calcSpecular(intersection))
+                    )
+            );
         }
         return color;
     }
 
+    // ──────────────────────────────────────────────────────────────────────────
+    //  Phong components
+    // ──────────────────────────────────────────────────────────────────────────
+
     /**
-     * Calculates the diffuse component: kD * |l · n|
+     * Computes the diffuse component: {@code kD × |n · l|}.
+     *
+     * @param intersection the pre-processed intersection (nl, material must be set)
+     * @return the diffuse attenuation factor
      */
-    private Double3 calcDiffuse(Material material, double ln) {
-        return material.kD.scale(Math.abs(ln));
+    private Double3 calcDiffuse(Intersection intersection) {
+        return intersection.material.kD.scale(Math.abs(intersection.nl));
     }
 
     /**
-     * Calculates the specular component: kS * max(0, -v · r)^nShininess
+     * Computes the specular component: {@code kS × max(0, -v · r)^nShininess},
+     * where {@code r = l - 2(n · l)n} is the mirror-reflection vector.
+     *
+     * @param intersection the pre-processed intersection (l, nl, n, v, material must be set)
+     * @return the specular attenuation factor
      */
-    private Double3 calcSpecular(Material material, Vector n, Vector l, double ln, Vector v) {
-        // Reflection vector: r = l - 2*(l·n)*n
-        Vector r = l.subtract(n.scale(2.0 * ln));
-        double vr = alignZero(-v.dotProduct(r));
+    private Double3 calcSpecular(Intersection intersection) {
+        // Reflection of l about n:  r = l - 2(n·l)·n
+        var r = intersection.l.subtract(intersection.n.scale(2.0 * intersection.nl));
+        double vr = -intersection.v.dotProduct(r);   // alignZero not needed: Math.pow handles near-0
         if (vr <= 0) return Double3.ZERO;
-        return material.kS.scale(Math.pow(vr, material.nShininess));
+        return intersection.material.kS.scale(Math.pow(vr, intersection.material.nShininess));
     }
 }

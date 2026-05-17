@@ -103,9 +103,9 @@ public class Polygon extends Geometry {
      * @return a list containing the intersection point, or null if there is none
      */
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
+    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
         // First, check if the ray intersects the plane of the polygon
-        var planeIntersections = _plane.findGeoIntersections(ray);
+        var planeIntersections = _plane.findIntersections(ray); // Changed to findIntersections
         if (planeIntersections == null) {
             return null;
         }
@@ -135,6 +135,7 @@ public class Polygon extends Geometry {
             }
         }
 
-        return List.of(new GeoPoint(this, planeIntersections.get(0).point));
+        // Return valid intersection syntax wrapper
+        return List.of(new Intersection(this, planeIntersections.get(0)));
     }
 }

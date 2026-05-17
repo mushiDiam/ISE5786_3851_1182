@@ -52,12 +52,12 @@ public class Geometries extends Intersectable {
      * @return a list of all intersection points, or null if none are found
      */
     @Override
-    protected List<GeoPoint> findGeoIntersectionsHelper(Ray ray) {
-        List<GeoPoint> intersections = null;
+    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
+        List<Intersection> intersections = null;
 
         for (Intersectable geometry : geometries) { // Assuming your list is named 'geometries'
             // Use the public NVI method to get intersections
-            var geoIntersections = geometry.findGeoIntersections(ray);
+            var geoIntersections = geometry.calcIntersections(ray);
             if (geoIntersections != null) {
                 if (intersections == null) {
                     intersections = new java.util.LinkedList<>();
