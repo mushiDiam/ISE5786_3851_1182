@@ -1,59 +1,80 @@
 package renderer;
 
 import geometries.api.Intersectable.GeoPoint;
-import primitives.Color;
-import primitives.Ray;
+import lighting.LightSource;
+import primitives.*;
 import scene.Scene;
 
 import java.util.List;
 
+import static primitives.Util.alignZero;
+
 /**
- * A simple implementation of a ray tracer.
- * Calculates the color of a pixel by finding the closest intersection point of a ray
- * and using the scene's ambient light combined with the object's emission color.
+ * A simple ray tracer implementing the Phong reflection model.
  */
 class SimpleRayTracer extends RayTracerBase {
 
-    /**
-     * Constructs a SimpleRayTracer with a given scene.
-     *
-     * @param scene the scene to be rendered
-     */
     public SimpleRayTracer(Scene scene) {
         super(scene);
     }
 
     @Override
     Color traceRay(Ray ray) {
-        // Find all intersections using the new NVI method returning GeoPoints
         List<GeoPoint> intersections = _scene.geometries.findGeoIntersections(ray);
-
-        // If the ray does not intersect any geometry, return the scene background color
-        if (intersections == null || intersections.isEmpty()) {
+        if (intersections == null || intersections.isEmpty())
             return _scene.background;
-        }
 
-        // Find the closest intersection GeoPoint to the ray origin
         GeoPoint closestPoint = ray.findClosestGeoPoint(intersections);
 
-        // Calculate and return the color at that specific point
+        if (!preprocessIntersection(closestPoint, ray.direction())) {
+            return _scene.ambientLight.getIntensity().scale(closestPoint.geometry.getMaterial().kA)
+                    .add(closestPoint.geometry.getEmission());
+        }
+
         return calcColor(closestPoint, ray);
     }
 
-    /**
-     * Calculates the color at a specific intersection point.
-     * Combines the ambient light of the scene scaled by the material's kA,
-     * with the emission color of the geometry.
-     *
-     * @param intersection the GeoPoint of intersection (includes geometry and point)
-     * @param ray          the ray that caused the intersection
-     * @return the calculated color at the given point
-     */
-    private Color calcColor(GeoPoint intersection, Ray ray) {
+    private Color calcColor(GeoPoint gp, Ray ray) {
         return _scene.ambientLight.getIntensity()
-                // Scale the ambient light by the material's kA factor
-                .scale(intersection.geometry.getMaterial().kA)
-                // Add the geometry's own emission color
-                .add(intersection.geometry.getEmission());
+                .scale(gp.geometry.getMaterial().kA)
+                .add(calcLocalEffects(gp)); // Plus besoin de passer "ray", gp contient "v"
+    }
+
+    private Color calcLocalEffects(GeoPoint gp) {
+        Color color = gp.geometry.getEmission();
+        Material material = gp.geometry.getMaterial();
+
+        for (LightSource lightSource : _scene.lights) {
+            // Utilisation du cache pour la source de lumière
+            if (preprocessLightSource(gp, lightSource)) {
+                Vector l = lightSource.getL(gp.point);
+                double nl = primitives.Util.alignZero(gp.n.dotProduct(l));
+
+                Color iL = lightSource.getIntensity(gp.point);
+                color = color.add(
+                        iL.scale(calcDiffuse(material, nl)
+                                .add(calcSpecular(material, gp.n, l, nl, gp.v)))
+                );
+            }
+        }
+        return color;
+    }
+
+    /**
+     * Calculates the diffuse component: kD * |l · n|
+     */
+    private Double3 calcDiffuse(Material material, double ln) {
+        return material.kD.scale(Math.abs(ln));
+    }
+
+    /**
+     * Calculates the specular component: kS * max(0, -v · r)^nShininess
+     */
+    private Double3 calcSpecular(Material material, Vector n, Vector l, double ln, Vector v) {
+        // Reflection vector: r = l - 2*(l·n)*n
+        Vector r = l.subtract(n.scale(2.0 * ln));
+        double vr = alignZero(-v.dotProduct(r));
+        if (vr <= 0) return Double3.ZERO;
+        return material.kS.scale(Math.pow(vr, material.nShininess));
     }
 }

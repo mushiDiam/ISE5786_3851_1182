@@ -2,6 +2,7 @@ package geometries.api;
 
 import primitives.Point;
 import primitives.Ray;
+import primitives.Vector;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +18,11 @@ public abstract class Intersectable {
     public static class GeoPoint {
         public Geometry geometry;
         public Point point;
+
+        // --- Champs de cache (Partie B, Étape 6) ---
+        public Vector n;  // normal
+        public Vector v;  // Vector direction of the ray
+        public double nv; // n * v
 
         /**
          * Constructor for GeoPoint.
