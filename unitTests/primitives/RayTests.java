@@ -18,6 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 class RayTests {
 
+    /**
+     * Default constructor for RayTests.
+     */
+    RayTests() {
+    }
+
     // ──────────────────────────── shared constants ────────────────────────────
 
     /**

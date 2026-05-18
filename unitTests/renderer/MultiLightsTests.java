@@ -18,21 +18,39 @@ import static java.awt.Color.BLUE;
 
 /**
  * Integration tests with multiple simultaneous light sources.
- * */
+ */
 class MultiLightsTests {
 
+    /**
+     * Default constructor for MultiLightsTests.
+     */
+    MultiLightsTests() {
+    }
+
+    /**
+     * The first scene, used for testing a sphere with multiple lights.
+     */
     private final Scene scene1 = new Scene("Test multi-lights sphere")
             .setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE).scale(0.15)));
 
+    /**
+     * The second scene, used for testing triangles with multiple lights.
+     */
     private final Scene scene2 = new Scene("Test multi-lights triangles")
             .setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE).scale(0.15)));
 
+    /**
+     * The camera configuration for the first scene.
+     */
     private final Camera.Builder camera1 = Camera.getBuilder()
             .setRayTracer(scene1, RayTracerType.SIMPLE)
             .setLocation(new Point(0, 0, 1000))
             .setDirection(Point.ZERO, Vector.AXIS_Y)
             .setVpSize(150, 150).setVpDistance(1000);
 
+    /**
+     * The camera configuration for the second scene.
+     */
     private final Camera.Builder camera2 = Camera.getBuilder()
             .setRayTracer(scene2, RayTracerType.SIMPLE)
             .setLocation(new Point(0, 0, 1000))

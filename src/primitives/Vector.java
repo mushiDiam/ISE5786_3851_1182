@@ -14,8 +14,19 @@ package primitives;
  */
 public final class Vector extends Point {
 
+    /**
+     * Unit vector in the positive X-axis direction.
+     */
     public static final Vector AXIS_X = new Vector(1, 0, 0);
+
+    /**
+     * Unit vector in the positive Y-axis direction.
+     */
     public static final Vector AXIS_Y = new Vector(0, 1, 0);
+
+    /**
+     * Unit vector in the positive Z-axis direction.
+     */
     public static final Vector AXIS_Z = new Vector(0, 0, 1);
 
     /**

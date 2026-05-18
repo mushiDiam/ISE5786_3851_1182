@@ -21,6 +21,7 @@ public class Point {
 
     /**
      * Constructor for Point using 3 coordinates.
+     *
      * @param x the x coordinate
      * @param y the y coordinate
      * @param z the z coordinate
@@ -31,20 +32,44 @@ public class Point {
 
     /**
      * Constructor for Point using a Double3 object.
+     *
      * @param xyz the Double3 coordinates
      */
     public Point(Double3 xyz) {
         this._xyz = xyz;
     }
 
-    public double getX() { return _xyz._d1(); }
-    public double getY() { return _xyz._d2(); }
-    public double getZ() { return _xyz._d3(); }
+    /**
+     * Returns the X coordinate of this point.
+     *
+     * @return the X coordinate
+     */
+    public double getX() {
+        return _xyz._d1();
+    }
+
+    /**
+     * Returns the Y coordinate of this point.
+     *
+     * @return the Y coordinate
+     */
+    public double getY() {
+        return _xyz._d2();
+    }
+
+    /**
+     * Returns the Z coordinate of this point.
+     *
+     * @return the Z coordinate
+     */
+    public double getZ() {
+        return _xyz._d3();
+    }
 
     /**
      * Subtracts a point from this point, returning a vector from the other point to this point.
-     * @param p the point to subtract
      *
+     * @param p the point to subtract
      * @return a new Vector representing the difference
      */
     public Vector subtract(Point p) {
@@ -53,8 +78,8 @@ public class Point {
 
     /**
      * Adds a vector to this point, returning a new point.
-     * @param v the vector to add
      *
+     * @param v the vector to add
      * @return a new Point representing the sum
      */
     public Point add(Vector v) {
@@ -63,8 +88,8 @@ public class Point {
 
     /**
      * Computes the squared distance between this point and another point.
-     * @param p the other point
      *
+     * @param p the other point
      * @return the squared distance
      */
     public double distanceSquared(Point p) {
@@ -77,8 +102,8 @@ public class Point {
 
     /**
      * Computes the distance between this point and another point.
-     * @param p the other point
      *
+     * @param p the other point
      * @return the distance
      */
     public double distance(Point p) {

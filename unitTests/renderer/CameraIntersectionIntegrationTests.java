@@ -19,9 +19,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * These tests verify that rays generated through a pixel grid correctly intersect
  * with various shapes (Sphere, Plane, Triangle) and yield the expected total count.
  * </p>
- * * @author Dhéliat
+ *
+ * @author Dhéliat
  */
 class CameraIntersectionIntegrationTests {
+
+    /**
+     * Default constructor for CameraIntersectionIntegrationTests.
+     */
+    CameraIntersectionIntegrationTests() {
+    }
 
     /**
      * Helper method to calculate the total number of intersections between a camera's
@@ -141,7 +148,15 @@ class CameraIntersectionIntegrationTests {
                 new Triangle(new Point(0, 20, -2), new Point(1, -1, -2), new Point(-1, -1, -2)), 2);
     }
 
+    /**
+     * Tests related to directional light behavior.
+     */
     static class DirectionalLightTests {
 
+        /**
+         * Constructs the directional light test class.
+         */
+        DirectionalLightTests() {
+        }
     }
 }

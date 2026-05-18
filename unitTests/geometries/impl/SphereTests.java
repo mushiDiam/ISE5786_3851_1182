@@ -1,6 +1,5 @@
 package geometries.impl;
 
-import geometries.impl.Sphere;
 import org.junit.jupiter.api.Test;
 import primitives.Point;
 import primitives.Ray;
@@ -8,14 +7,31 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link geometries.impl.Sphere} class.
  */
 class SphereTests {
+
+    /**
+     * Default constructor for SphereTests.
+     */
+    SphereTests() {
+    }
+
+    /**
+     * A predefined point on the X-axis used for tests.
+     */
     private static final Point p100 = new Point(1, 0, 0);
+
+    /**
+     * Sphere instance used for intersection tests.
+     */
     private static final Sphere SPHERE = new Sphere(p100, 1d);
+
     /**
      * Test method for {@link geometries.impl.Sphere#getNormal(primitives.Point)}.
      */
@@ -122,11 +138,11 @@ class SphereTests {
                 "Tangent line, ray starts after");
 
         // **** Group 4: Special cases
-        // BV41: Ray's line is outside sphere, ray is orthogonal to ray start to sphere's center line [cite: 157]
+        // BV41: Ray's line is outside sphere, ray is orthogonal to ray start to sphere's center line
         assertNull(SPHERE.findIntersections(new Ray(new Point(3, 0, 0), new Vector(0, 0, 1))),
                 "Ray orthogonal to start-to-center line, outside");
 
-        // BV42: Ray starts inside, ray is orthogonal to ray start to sphere's center line [cite: 158]
+        // BV42: Ray starts inside, ray is orthogonal to ray start to sphere's center line
         List<Point> result42 = SPHERE.findIntersections(new Ray(new Point(1.5, 0, 0), new Vector(0, 0, 1)));
         assertNotNull(result42, "Wrong sphere intersection result");
         assertEquals(1, result42.size(), "Wrong number of points");

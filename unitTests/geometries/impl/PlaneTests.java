@@ -7,12 +7,21 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link geometries.impl.Plane} class.
  */
 class PlaneTests {
+
+    /**
+     * Default constructor for PlaneTests.
+     */
+    PlaneTests() {
+    }
 
     /**
      * Test method for {@link geometries.impl.Plane#Plane(primitives.Point, primitives.Point, primitives.Point)}.
@@ -117,6 +126,4 @@ class PlaneTests {
         assertNull(plane.findIntersections(new Ray(new Point(1, 0, 0), new Vector(1, 1, 1))),
                 "Ray starts at the reference point of the plane");
     }
-
-
 }

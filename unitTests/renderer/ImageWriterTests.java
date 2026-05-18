@@ -9,6 +9,12 @@ import primitives.Color;
 class ImageWriterTests {
 
     /**
+     * Default constructor for ImageWriterTests.
+     */
+    ImageWriterTests() {
+    }
+
+    /**
      * Test method for writing a basic image with a grid.
      */
     @Test

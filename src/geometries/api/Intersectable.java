@@ -18,6 +18,12 @@ import java.util.Objects;
 public abstract class Intersectable {
 
     /**
+     * Default constructor for Intersectable.
+     */
+    public Intersectable() {
+    }
+
+    /**
      * Represents a single intersection between a ray and a geometry.
      * <p>
      * Acts as a cache for all per-intersection and per-light-source values

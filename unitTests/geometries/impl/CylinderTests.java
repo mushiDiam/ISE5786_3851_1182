@@ -7,12 +7,40 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Unit tests for {@link geometries.impl.Cylinder} class.
+ * Unit tests for the {@link Cylinder} class.
  */
 class CylinderTests {
+
+    /**
+     * Constructs the cylinder test class.
+     */
+    CylinderTests() {
+    }
+
+    /**
+     * Radius of the cylinder used for tests.
+     */
+    private static final double RADIUS = 2d;
+
+    /**
+     * Height of the cylinder used for tests.
+     */
+    private static final double HEIGHT = 4d;
+
+    /**
+     * Axis ray of the cylinder used for tests.
+     */
+    private static final Ray AXIS = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
+
+    /**
+     * Cylinder instance used for intersection tests.
+     */
+    private static final Cylinder CYLINDER = new Cylinder(RADIUS, AXIS, HEIGHT);
 
     /**
      * Test method for {@link geometries.impl.Cylinder#getNormal(primitives.Point)}.
@@ -52,11 +80,6 @@ class CylinderTests {
         assertEquals(new Vector(0, 0, -1), cylinder.getNormal(new Point(1, 0, 0)),
                 "ERROR: getNormal() wrong result for edge of bottom base");
     }
-
-    private static final double RADIUS = 2d;
-    private static final double HEIGHT = 4d;
-    private static final Ray AXIS = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
-    private static final Cylinder CYLINDER = new Cylinder(RADIUS, AXIS, HEIGHT);
 
     /**
      * Test method for {@link geometries.impl.Cylinder#findIntersections(primitives.Ray)}.

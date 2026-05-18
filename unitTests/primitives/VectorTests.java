@@ -12,6 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class VectorTests {
 
     /**
+     * Default constructor for VectorTests.
+     */
+    VectorTests() {
+    }
+
+    /**
      * Tolerance for floating-point comparisons
      */
     private static final double DELTA = 0.00001;

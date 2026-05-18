@@ -10,20 +10,29 @@ import primitives.Vector;
  */
 public class PointLight extends Light implements LightSource {
 
-    /** The position of the light in the scene */
-    protected final Point _position;
+    /**
+     * The position of the light in the scene
+     */
+    private final Point _position;
 
-    /** Constant attenuation factor (kC) */
+    /**
+     * Constant attenuation factor (kC)
+     */
     private double _kC = 1.0;
 
-    /** Linear attenuation factor (kL) */
+    /**
+     * Linear attenuation factor (kL)
+     */
     private double _kL = 0.0;
 
-    /** Quadratic attenuation factor (kQ) */
+    /**
+     * Quadratic attenuation factor (kQ)
+     */
     private double _kQ = 0.0;
 
     /**
      * Constructs a point light with the given intensity and position.
+     *
      * @param intensity the light's color/intensity
      * @param position  the position of the light in the scene
      */
@@ -34,6 +43,7 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the constant attenuation factor.
+     *
      * @param kC the constant factor
      * @return this (for method chaining)
      */
@@ -44,6 +54,7 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the linear attenuation factor.
+     *
      * @param kL the linear factor
      * @return this (for method chaining)
      */
@@ -54,6 +65,7 @@ public class PointLight extends Light implements LightSource {
 
     /**
      * Sets the quadratic attenuation factor.
+     *
      * @param kQ the quadratic factor
      * @return this (for method chaining)
      */

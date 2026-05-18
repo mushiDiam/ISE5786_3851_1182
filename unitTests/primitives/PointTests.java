@@ -11,6 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PointTests {
 
     /**
+     * Default constructor for PointTests.
+     */
+    PointTests() {
+    }
+
+    /**
      * Error message for wrong distance calculation
      */
     private static final String ERROR_DISTANCE = "ERROR: Distance calculation is incorrect";

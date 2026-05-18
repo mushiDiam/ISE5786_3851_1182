@@ -157,9 +157,15 @@ public class Cylinder extends Tube {
     }
 
     /**
-     * Helper method to return a sorted list of Intersections based on t1 and t2.
+     * Creates a sorted list of cylinder intersections according to their distance
+     * from the ray origin.
+     *
+     * @param ray the ray used to calculate the intersection points
+     * @param tA  the first intersection distance parameter
+     * @param tB  the second intersection distance parameter
+     * @return a list of intersections sorted by distance from the ray origin
      */
-    private List<Intersection> createSortedList(Ray ray, double tA, double tB) { // Fixed return type
+    private List<Intersection> createSortedList(Ray ray, double tA, double tB) {
         if (tA < tB) {
             return List.of(new Intersection(this, ray.getPoint(tA)), new Intersection(this, ray.getPoint(tB))); // Fixed types
         }

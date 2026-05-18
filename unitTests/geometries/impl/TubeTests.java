@@ -7,12 +7,36 @@ import primitives.Vector;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link geometries.impl.Tube} class.
  */
 class TubeTests {
+
+    /**
+     * Default constructor for TubeTests.
+     */
+    TubeTests() {
+    }
+
+    /**
+     * Radius of the tube used for tests.
+     */
+    private static final double RADIUS = 2d;
+
+    /**
+     * Axis ray of the tube used for tests.
+     */
+    private static final Ray AXIS = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
+
+    /**
+     * Tube instance used for intersection tests.
+     */
+    private static final Tube TUBE = new Tube(RADIUS, AXIS);
+
     /**
      * Test method for {@link geometries.impl.Tube#getNormal(primitives.Point)}.
      */
@@ -36,9 +60,6 @@ class TubeTests {
                 "ERROR: getNormal() wrong result for a point exactly opposite the ray's head");
     }
 
-    private static final double RADIUS = 2d;
-    private static final Ray AXIS = new Ray(new Point(0, 0, 0), new Vector(0, 0, 1));
-    private static final Tube TUBE = new Tube(RADIUS, AXIS);
     /**
      * Test method for {@link geometries.impl.Tube#findIntersections(primitives.Ray)}.
      */

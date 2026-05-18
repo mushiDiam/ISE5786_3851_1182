@@ -17,6 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class GeometriesTests {
 
     /**
+     * Default constructor for GeometriesTests.
+     */
+    GeometriesTests() {
+    }
+
+    /**
      * Test method for {@link geometries.impl.Geometries#findIntersections(primitives.Ray)}.
      */
     @Test
@@ -29,7 +35,7 @@ class GeometriesTests {
         Geometries geometries = new Geometries(plane, sphere, triangle);
 
         // ============ Equivalence Partitions Tests ==============
-        // EP01: Some geometries are intersected (Sphere and Triangle, but not Plane) [cite: 73]
+        // EP01: Some geometries are intersected (Sphere and Triangle, but not Plane)
         List<Point> resultEP = geometries.findIntersections(new Ray(new Point(0, 0, 1.5), new Vector(0, 0, 1)));
         assertNotNull(resultEP, "Expected intersections");
         assertEquals(3, resultEP.size(), "Wrong number of points: expected 3 (2 from sphere, 1 from triangle) ");
@@ -40,16 +46,16 @@ class GeometriesTests {
         assertNull(emptyGeometries.findIntersections(new Ray(new Point(0, 0, 0), new Vector(1, 0, 0))),
                 "Empty geometries should return null");
 
-        // BV02: No geometry is intersected [cite: 74]
+        // BV02: No geometry is intersected
         assertNull(geometries.findIntersections(new Ray(new Point(0, 0, 6), new Vector(0, 0, 1))),
                 "No geometry intersected should return null (not empty list)");
 
-        // BV03: Only one geometry is intersected (Triangle) [cite: 74]
+        // BV03: Only one geometry is intersected (Triangle)
         List<Point> resultBV03 = geometries.findIntersections(new Ray(new Point(0, 0, 4.5), new Vector(0, 0, 1)));
         assertNotNull(resultBV03, "Expected intersections");
         assertEquals(1, resultBV03.size(), "Wrong number of points: expected 1 ");
 
-        // BV04: All geometries are intersected [cite: 74]
+        // BV04: All geometries are intersected
         List<Point> resultBV04 = geometries.findIntersections(new Ray(new Point(0, 0, -1), new Vector(0, 0, 1)));
         assertNotNull(resultBV04, "Expected intersections");
         // 1 (Plane) + 2 (Sphere) + 1 (Triangle) = 4 points
