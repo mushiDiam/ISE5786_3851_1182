@@ -137,23 +137,14 @@ public abstract class Intersectable {
                 .toList();
     }
 
-    /**
-     * Returns all intersections with the given ray as {@link Intersection} objects
-     * that carry the geometry reference. This is the public NVI entry point.
-     *
-     * @param ray the intersecting ray
-     * @return list of {@link Intersection} objects, or {@code null} if there are none
-     */
     public final List<Intersection> calcIntersections(Ray ray) {
-        return calcIntersectionsHelper(ray);
+        return calcIntersections(ray, Double.POSITIVE_INFINITY);
     }
 
-    /**
-     * Internal helper that each concrete geometry must implement.
-     * Must return {@code null} (not an empty list) when there are no intersections.
-     *
-     * @param ray the intersecting ray
-     * @return list of {@link Intersection} objects, or {@code null} if there are none
-     */
-    protected abstract List<Intersection> calcIntersectionsHelper(Ray ray);
+    public final List<Intersection> calcIntersections(Ray ray, double maxDistance) {
+        return calcIntersectionsHelper(ray, maxDistance);
+    }
+
+    protected abstract List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance);
+
 }

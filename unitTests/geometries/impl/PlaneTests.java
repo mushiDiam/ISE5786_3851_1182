@@ -126,4 +126,25 @@ class PlaneTests {
         assertNull(plane.findIntersections(new Ray(new Point(1, 0, 0), new Vector(1, 1, 1))),
                 "Ray starts at the reference point of the plane");
     }
+
+    /**
+     * Test method for {@link geometries.api.Intersectable#calcIntersections(Ray, double)}.
+     * Tests the Bonus functionality (Stage 8) ensuring intersections are properly filtered
+     * by the maxDistance parameter.
+     */
+    @Test
+    void testCalcIntersectionsWithMaxDistance() {
+        Plane plane = new Plane(new Point(1, 0, 0), new Vector(0, 1, 0));
+        // Ray orthogonal to plane y=0. Intersects at (1, 0, 0) with a distance of 2.
+        Ray ray = new Ray(new Point(1, -2, 0), new Vector(0, 1, 0));
+
+        // TC01: maxDistance is smaller than the intersection distance
+        assertNull(plane.calcIntersections(ray, 1), "Expected no intersections because maxDistance is too small");
+
+        // TC02: maxDistance is exactly the intersection distance
+        assertEquals(1, plane.calcIntersections(ray, 2).size(), "Expected 1 intersection at the maxDistance boundary");
+
+        // TC03: maxDistance is larger than the intersection distance
+        assertEquals(1, plane.calcIntersections(ray, 3).size(), "Expected 1 intersection since point is within maxDistance");
+    }
 }

@@ -25,15 +25,16 @@ public class Triangle extends Polygon {
     /**
      * Finds intersections between a ray and the triangle.
      * Uses the normal vectors of the edges to determine if the intersection point
-     * on the plane is inside the triangle.
+     * on the plane is inside the triangle, bounded by the maxDistance.
      *
-     * @param ray the ray to intersect with the triangle
+     * @param ray         the ray to intersect with the triangle
+     * @param maxDistance the maximum allowed distance for an intersection
      * @return a list containing the intersection point, or null if there is none
      */
     @Override
-    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
-        // First, check if the ray intersects the plane of the triangle
-        var planeIntersections = _plane.findIntersections(ray);
+    protected List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance) {
+        // Pass maxDistance down to the plane. The plane handles the distance filtering!
+        var planeIntersections = _plane.calcIntersections(ray, maxDistance);
         if (planeIntersections == null) {
             return null;
         }
@@ -58,8 +59,9 @@ public class Triangle extends Polygon {
         }
 
         if ((s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
-            // The point is inside the triangle, return it wrapped with 'this' (the Triangle)
-            return List.of(new Intersection(this, planeIntersections.get(0)));
+            // The point is inside the triangle. Extract the point from the plane's intersection
+            // and wrap it with 'this' (the Triangle geometry).
+            return List.of(new Intersection(this, planeIntersections.get(0).point));
         }
 
         return null;

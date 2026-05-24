@@ -76,4 +76,26 @@ class TriangleTests {
         assertNull(triangle.findIntersections(new Ray(new Point(3, -0.5, -1), new Vector(0, 0, 1))),
                 "Ray intersects on edge's continuation");
     }
+
+    /**
+     * Test method for {@link geometries.api.Intersectable#calcIntersections(Ray, double)}.
+     * Tests the Bonus functionality (Stage 8) ensuring intersections are properly filtered
+     * by the maxDistance parameter.
+     */
+    @Test
+    void testCalcIntersectionsWithMaxDistance() {
+        Triangle triangle = new Triangle(new Point(0, 1, 0), new Point(2, 0, 0), new Point(-2, 0, 0));
+
+        // Ray orthogonal to the triangle pointing upwards. Intersects at (0, 0.5, 0) with distance 1.
+        Ray ray = new Ray(new Point(0, 0.5, -1), new Vector(0, 0, 1));
+
+        // TC01: maxDistance is smaller than the intersection distance
+        assertNull(triangle.calcIntersections(ray, 0.5), "Expected no intersections because maxDistance is too small");
+
+        // TC02: maxDistance is exactly the intersection distance
+        assertEquals(1, triangle.calcIntersections(ray, 1).size(), "Expected 1 intersection at the maxDistance boundary");
+
+        // TC03: maxDistance is larger than the intersection distance
+        assertEquals(1, triangle.calcIntersections(ray, 2).size(), "Expected 1 intersection since point is within maxDistance");
+    }
 }

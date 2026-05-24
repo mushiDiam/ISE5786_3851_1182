@@ -10,11 +10,14 @@ import primitives.Vector;
  */
 public class DirectionalLight extends Light implements LightSource {
 
-    /** The fixed direction of the light (normalized) */
+    /**
+     * The fixed direction of the light (normalized)
+     */
     private final Vector _direction;
 
     /**
      * Constructs a directional light with the given intensity and direction.
+     *
      * @param intensity the light's color/intensity
      * @param direction the direction of the light (will be normalized)
      */
@@ -33,5 +36,10 @@ public class DirectionalLight extends Light implements LightSource {
     public Color getIntensity(Point p) {
         // For directional light, intensity is constant (no distance attenuation)
         return _intensity;
+    }
+
+    @Override
+    public double getDistance(Point point) {
+        return Double.POSITIVE_INFINITY;
     }
 }

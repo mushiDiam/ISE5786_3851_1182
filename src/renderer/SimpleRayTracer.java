@@ -4,21 +4,18 @@ import geometries.api.Intersectable.Intersection;
 import lighting.LightSource;
 import primitives.Color;
 import primitives.Double3;
+import primitives.Point;
 import primitives.Ray;
+import primitives.Vector;
 import scene.Scene;
 
 /**
  * A simple ray tracer implementing the Phong reflection model.
- * <p>
- * For each primary ray:
- * <ol>
- *   <li>Find the closest intersection with any geometry in the scene.</li>
- *   <li>Compute ambient light (scaled by the material's kA) plus emission.</li>
- *   <li>For each light source, add diffuse and specular contributions
- *       (only when the light and camera are on the same side of the surface).</li>
- * </ol>
+ * Now includes support for hard shadows (Part 1 of Stage 8).
  */
 class SimpleRayTracer extends RayTracerBase {
+
+    private static final double DELTA = 0.1;
 
     /**
      * Constructs a SimpleRayTracer for the given scene.
@@ -46,14 +43,6 @@ class SimpleRayTracer extends RayTracerBase {
     //  Color computation
     // ──────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Computes the full color at an intersection point using the Phong model.
-     * Color = (kA × ambient) + emission + localEffects
-     *
-     * @param gp  the closest intersection
-     * @param ray the primary camera ray
-     * @return the computed color at this point
-     */
     private Color calcColor(Intersection gp, Ray ray) {
         Color base = _scene.ambientLight.getIntensity()
                 .scale(gp.material.kA)
@@ -65,13 +54,6 @@ class SimpleRayTracer extends RayTracerBase {
         return base.add(calcColorLocalEffects(gp));
     }
 
-    /**
-     * Computes the sum of all local light-source contributions (diffuse + specular)
-     * at the given intersection using the Phong reflection model.
-     *
-     * @param intersection the pre-processed intersection (n, v, vn must be set)
-     * @return the total local color contribution
-     */
     private Color calcColorLocalEffects(Intersection intersection) {
         Color color = Color.BLACK;
 
@@ -79,11 +61,14 @@ class SimpleRayTracer extends RayTracerBase {
             // Skip this light if it is on the opposite side of the surface
             if (!preprocessLightSource(intersection, lightSource)) continue;
 
-            color = color.add(
-                    intersection.iL.scale(
-                            calcDiffuse(intersection).add(calcSpecular(intersection))
-                    )
-            );
+            // Add the light only if the point is unshaded by this light source
+            if (unshaded(intersection, lightSource)) {
+                color = color.add(
+                        intersection.iL.scale(
+                                calcDiffuse(intersection).add(calcSpecular(intersection))
+                        )
+                );
+            }
         }
         return color;
     }
@@ -92,28 +77,41 @@ class SimpleRayTracer extends RayTracerBase {
     //  Phong components
     // ──────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Computes the diffuse component: {@code kD × |n · l|}.
-     *
-     * @param intersection the pre-processed intersection (nl, material must be set)
-     * @return the diffuse attenuation factor
-     */
     private Double3 calcDiffuse(Intersection intersection) {
         return intersection.material.kD.scale(Math.abs(intersection.nl));
     }
 
-    /**
-     * Computes the specular component: {@code kS × max(0, -v · r)^nShininess},
-     * where {@code r = l - 2(n · l)n} is the mirror-reflection vector.
-     *
-     * @param intersection the pre-processed intersection (l, nl, n, v, material must be set)
-     * @return the specular attenuation factor
-     */
     private Double3 calcSpecular(Intersection intersection) {
-        // Reflection of l about n:  r = l - 2(n·l)·n
         var r = intersection.l.subtract(intersection.n.scale(2.0 * intersection.nl));
-        double vr = -intersection.v.dotProduct(r);   // alignZero not needed: Math.pow handles near-0
+        double vr = -intersection.v.dotProduct(r);
         if (vr <= 0) return Double3.ZERO;
         return intersection.material.kS.scale(Math.pow(vr, intersection.material.nShininess));
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    //  Shadows (Part 1)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Checks if a specific intersection point is unshaded by a given light source.
+     *
+     * @param intersection the intersection point to check
+     * @param lightSource  the light source illuminating the point
+     * @return true if there is a clear line of sight to the light, false if shaded
+     */
+    private boolean unshaded(Intersection intersection, LightSource lightSource) {
+        Vector lightDirection = lightSource.getL(intersection.point).scale(-1);
+
+        Vector delta = intersection.n.scale(intersection.n.dotProduct(lightDirection) > 0 ? DELTA : -DELTA);
+        Point head = intersection.point.add(delta);
+        Ray lightRay = new Ray(head, lightDirection);
+
+        // Get the distance to the light source
+        double maxDistance = lightSource.getDistance(intersection.point);
+
+        // Pass the maxDistance directly to the geometry engine
+        var intersections = _scene.geometries.calcIntersections(lightRay, maxDistance);
+
+        return intersections == null || intersections.isEmpty();
     }
 }

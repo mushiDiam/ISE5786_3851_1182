@@ -86,4 +86,9 @@ public class PointLight extends Light implements LightSource {
         double attenuation = _kC + _kL * d + _kQ * d * d;
         return _intensity.scale(1.0 / attenuation);
     }
+
+    @Override
+    public double getDistance(Point point) {
+        return _position.distance(point);
+    }
 }
