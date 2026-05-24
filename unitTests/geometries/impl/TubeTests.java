@@ -168,5 +168,6 @@ class TubeTests {
 
         // TC05: maxDistance is larger than the second intersection (2 points)
         assertEquals(2, TUBE.calcIntersections(ray, 7).size(), "Expected 2 intersections since both are within maxDistance");
+
     }
 }
