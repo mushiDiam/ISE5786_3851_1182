@@ -40,7 +40,7 @@ public class ShowcaseTests {
         Scene scene = new Scene("Showcase Scene");
         scene.setAmbientLight(new AmbientLight(new Color(15, 15, 15)));
 
-        Material glassMaterial = new Material().setKD(0.1).setKS(0.2).setShininess(20).setKT(0.85);
+        Material glassMaterial = new Material().setKD(0.1).setKS(0.3).setShininess(20).setKT(0.7);
         Material mirrorMaterial = new Material().setKD(0.1).setKS(0.8).setShininess(60).setKR(0.85);
         Material matteMaterial = new Material().setKD(0.5).setKS(0.5).setShininess(30);
         Material floorMaterial = new Material().setKD(0.4).setKS(0.6).setShininess(50).setKR(0.2); // Slightly reflective floor
@@ -100,9 +100,9 @@ public class ShowcaseTests {
         // ==========================================
         // LIGHTS
         // ==========================================
-        scene.lights.add(new SpotLight(new Color(700, 400, 400), new Point(40, 100, 50), new Vector(-1, -1, -1))
+        scene.lights.add(new SpotLight(new Color(350, 200, 200), new Point(40, 100, 50), new Vector(-1, -1, -1))
                 .setKl(1E-5).setKq(1.5E-7));
-        scene.lights.add(new PointLight(new Color(500, 500, 500), new Point(-50, 50, 50))
+        scene.lights.add(new PointLight(new Color(250, 250, 250), new Point(-50, 50, 50))
                 .setKl(0.00001).setKq(0.000001));
 
         // ==========================================
