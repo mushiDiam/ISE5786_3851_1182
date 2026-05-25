@@ -1,8 +1,0 @@
-geometries.api
-geometries.impl
-geometries.tests
-lighting
-primitives
-renderer
-scene
-test
