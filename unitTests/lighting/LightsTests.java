@@ -1,4 +1,4 @@
-package renderer;
+package lighting;
 
 import static java.awt.Color.BLUE;
 
@@ -7,11 +7,9 @@ import org.junit.jupiter.api.Test;
 import geometries.api.Geometry;
 import geometries.impl.Sphere;
 import geometries.impl.Triangle;
-import lighting.AmbientLight;
-import lighting.DirectionalLight;
-import lighting.PointLight;
-import lighting.SpotLight;
 import primitives.*;
+import renderer.Camera;
+import renderer.RayTracerType;
 import scene.Scene;
 
 /**
@@ -32,7 +30,7 @@ class LightsTests {
       .setAmbientLight(new AmbientLight(new Color(38, 38, 38)));
 
    /** First camera builder for some of tests */
-   private final Camera.Builder  _camera1                  = Camera.getBuilder()                                //
+   private final Camera.Builder _camera1                  = Camera.getBuilder()                                //
       .setRayTracer(_scene1, RayTracerType.SIMPLE)                                                              //
       .setLocation(new Point(0, 0, 1000))                                                                       //
       .setDirection(Point.ZERO, Vector.AXIS_Y)                                                                  //

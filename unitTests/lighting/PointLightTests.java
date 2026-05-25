@@ -1,6 +1,5 @@
-package renderer;
+package lighting;
 
-import lighting.PointLight;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Point;
