@@ -1,17 +1,15 @@
-package renderer;
+package lighting;
 
 import geometries.impl.Sphere;
 import geometries.impl.Triangle;
-import lighting.AmbientLight;
-import lighting.DirectionalLight;
-import lighting.PointLight;
-import lighting.SpotLight;
 import org.junit.jupiter.api.Test;
 import primitives.Color;
 import primitives.Double3;
 import primitives.Material;
 import primitives.Point;
 import primitives.Vector;
+import renderer.Camera;
+import renderer.RayTracerType;
 import scene.Scene;
 
 import static java.awt.Color.BLUE;
