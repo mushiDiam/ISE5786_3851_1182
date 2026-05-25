@@ -26,18 +26,36 @@ public class DirectionalLight extends Light implements LightSource {
         this._direction = direction.normalize();
     }
 
+    /**
+     * Returns the constant normalized light direction.
+     *
+     * @param p the illuminated point (unused)
+     * @return the light direction vector
+     */
     @Override
     public Vector getL(Point p) {
         // For directional light, the direction is always constant
         return _direction;
     }
 
+    /**
+     * Returns the constant light intensity.
+     *
+     * @param p the illuminated point (unused)
+     * @return the light intensity
+     */
     @Override
     public Color getIntensity(Point p) {
         // For directional light, intensity is constant (no distance attenuation)
         return _intensity;
     }
 
+    /**
+     * Directional lights are effectively at an infinite distance.
+     *
+     * @param point the point to measure distance to (unused)
+     * @return positive infinity
+     */
     @Override
     public double getDistance(Point point) {
         return Double.POSITIVE_INFINITY;

@@ -1,6 +1,3 @@
-/**
- *
- */
 package primitives;
 
 import java.util.Objects;
@@ -46,25 +43,6 @@ public record Double3(double _d1, double _d2, double _d3) {
      */
     public Double3(double value) {
         this(value, value, value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return this == obj
-                || (obj instanceof Double3(double od1, double od2, double od3))
-                && isZero(_d1 - od1)
-                && isZero(_d2 - od2)
-                && isZero(_d3 - od3);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(_d1, _d2, _d3);
-    }
-
-    @Override
-    public String toString() {
-        return "(" + _d1 + "," + _d2 + "," + _d3 + ")";
     }
 
     /**
@@ -137,5 +115,46 @@ public record Double3(double _d1, double _d2, double _d3) {
      */
     public boolean isLowerThan(Double3 other) {
         return _d1 < other._d1 && _d2 < other._d2 && _d3 < other._d3;
+    }
+
+    /**
+     * Checks whether this triad is greater than a given value.
+     * This is the logical negation of isLowerThan.
+     *
+     * @param k the value to compare against
+     * @return true if this triad is not lower than k
+     */
+    public boolean isGreaterThan(double k) {
+        return !isLowerThan(k);
+    }
+
+    /**
+     * Checks whether this triad is greater than another triad.
+     * This is the logical negation of isLowerThan.
+     *
+     * @param other the triad to compare with
+     * @return true if this triad is not lower than the other triad
+     */
+    public boolean isGreaterThan(Double3 other) {
+        return !isLowerThan(other);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj
+                || (obj instanceof Double3(double od1, double od2, double od3))
+                && isZero(_d1 - od1)
+                && isZero(_d2 - od2)
+                && isZero(_d3 - od3);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_d1, _d2, _d3);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + _d1 + "," + _d2 + "," + _d3 + ")";
     }
 }

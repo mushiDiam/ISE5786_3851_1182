@@ -36,6 +36,60 @@ public class Material {
     public int nShininess = 0;
 
     /**
+     * Transparency coefficient.
+     */
+    public Double3 kT = Double3.ZERO;
+
+    /**
+     * Reflection coefficient.
+     */
+    public Double3 kR = Double3.ZERO;
+
+    /**
+     * Sets the transparency coefficient using a scalar value.
+     *
+     * @param kT transparency coefficient
+     * @return the current Material object for chaining
+     */
+    public Material setKT(double kT) {
+        this.kT = new Double3(kT);
+        return this;
+    }
+
+    /**
+     * Sets the reflection coefficient using a scalar value.
+     *
+     * @param kR reflection coefficient
+     * @return the current Material object for chaining
+     */
+    public Material setKR(double kR) {
+        this.kR = new Double3(kR);
+        return this;
+    }
+
+    /**
+     * Sets kT with a Double3 value.
+     *
+     * @param kT transmission coefficient
+     * @return the current Material object for chaining
+     */
+    public Material setKT(Double3 kT) {
+        this.kT = kT;
+        return this;
+    }
+    
+    /**
+     * Sets kR with a Double3 value.
+     *
+     * @param kR reflection coefficient
+     * @return the current Material object for chaining
+     */
+    public Material setKR(Double3 kR) {
+        this.kR = kR;
+        return this;
+    }
+
+    /**
      * Sets kA with a Double3 value.
      *
      * @param kA ambient light attenuation factor

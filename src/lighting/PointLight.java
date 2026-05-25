@@ -74,12 +74,24 @@ public class PointLight extends Light implements LightSource {
         return this;
     }
 
+    /**
+     * Returns the normalized direction from the light position to the point.
+     *
+     * @param p the illuminated point
+     * @return normalized direction from the light to the point
+     */
     @Override
     public Vector getL(Point p) {
         // Direction from light position to the illuminated point (normalized)
         return p.subtract(_position).normalize();
     }
 
+    /**
+     * Returns the attenuated light intensity at the given point.
+     *
+     * @param p the illuminated point
+     * @return the attenuated intensity
+     */
     @Override
     public Color getIntensity(Point p) {
         double d = _position.distance(p);
@@ -87,6 +99,12 @@ public class PointLight extends Light implements LightSource {
         return _intensity.scale(1.0 / attenuation);
     }
 
+    /**
+     * Returns the distance from the light position to the given point.
+     *
+     * @param point the point to measure distance to
+     * @return the distance from the light source
+     */
     @Override
     public double getDistance(Point point) {
         return _position.distance(point);

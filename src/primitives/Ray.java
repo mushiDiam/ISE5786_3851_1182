@@ -9,6 +9,9 @@ import java.util.Objects;
  * Represents a ray in 3D space, which is a half-line defined by a starting point and a direction vector.
  */
 public final class Ray {
+    /** Small offset used to shift secondary rays away from surfaces. */
+    private static final double DELTA = 0.1;
+
     /**
      * The starting point of the ray.
      */
@@ -18,6 +21,7 @@ public final class Ray {
      * The normalized direction vector of the ray.
      */
     private final Vector _direction;
+
 
     /**
      * Constructs a ray with a given starting point and direction.
@@ -29,6 +33,20 @@ public final class Ray {
     public Ray(Point origin, Vector direction) {
         _origin = origin;
         _direction = direction.normalize();
+    }
+
+    /**
+     * Constructor for secondary rays (shadow, reflection, refraction)
+     * that shifts the ray's head slightly along the normal to prevent self-intersection.
+     *
+     * @param head      the original starting point
+     * @param direction the direction of the ray
+     * @param normal    the normal at the starting point
+     */
+    public Ray(Point head, Vector direction, Vector normal) {
+        Vector delta = normal.scale(normal.dotProduct(direction) > 0 ? DELTA : -DELTA);
+        this._origin = head.add(delta);
+        this._direction = direction.normalize();
     }
 
     /**

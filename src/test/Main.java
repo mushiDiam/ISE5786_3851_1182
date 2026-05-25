@@ -87,16 +87,6 @@ public final class Main {
     }
 
     /**
-     * Basic test for the Ray constructor.
-     * Verifies that the direction vector is normalized by the constructor.
-     */
-    private static void rayTests() {
-        Ray r = new Ray(P1, new Vector(2, 4, 6));
-        if (!isZero(r.direction().length() - 1))
-            out.println("ERROR: Ray direction is not normalized");
-    }
-
-    /**
      * Method for testing operations on points
      */
     private static void pointTests() {
@@ -143,47 +133,6 @@ public final class Main {
         double d = P1.distance(P3);
         if (!isZero(d * d - P1.distanceSquared(P3)))
             out.println("ERROR: distance and distanceSquared inconsistent");
-    }
-
-    /**
-     * Method for testing operations on single vector
-     */
-    private static void vectorSingleOperationTests() {
-        // test zero vector =====================================================
-        try {
-            new Vector(0, 0, 0);
-            new Vector(Double3.ZERO);
-            out.println("ERROR: zero vector does not throw an exception");
-        } catch (IllegalArgumentException _) {
-            /* ignored */
-        } catch (Exception _) {
-            out.println("ERROR: zero vector throws wrong exception");
-        }
-
-        // test length
-        if (!isZero(V4.lengthSquared() - 9))
-            out.println("ERROR: lengthSquared() wrong value");
-        if (!isZero(V4.length() - 3))
-            out.println("ERROR: length() wrong value");
-
-        // test vector normalization vs vector length and cross-product
-        Vector u = V1.normalize();
-        if (!isZero(u.length() - 1))
-            out.println("ERROR: the normalized vector is not a unit vector");
-        try { // test that the vectors are co-lined
-            V1.crossProduct(u);
-            out.println("ERROR: the normalized vector is not parallel to the original one");
-        } catch (Exception _) { /* ignored */ }
-        if (V1.dotProduct(u) < 0)
-            out.println("ERROR: the normalized vector is opposite to the original one");
-
-        // Test scale
-        if (!V1.scale(2).equals(new Vector(2, 4, 6)))
-            out.println("ERROR: scale() wrong result");
-        try {
-            V1.scale(0);
-            out.println("ERROR: scale(0) should throw exception");
-        } catch (IllegalArgumentException _) { /* ignored */ }
     }
 
     /**
@@ -236,6 +185,57 @@ public final class Main {
         Vector b = V3.crossProduct(V1);
         if (!a.equals(b.scale(-1)))
             out.println("ERROR: cross product anti-commutativity wrong");
+    }
+
+    /**
+     * Method for testing operations on single vector
+     */
+    private static void vectorSingleOperationTests() {
+        // test zero vector =====================================================
+        try {
+            new Vector(0, 0, 0);
+            new Vector(Double3.ZERO);
+            out.println("ERROR: zero vector does not throw an exception");
+        } catch (IllegalArgumentException _) {
+            /* ignored */
+        } catch (Exception _) {
+            out.println("ERROR: zero vector throws wrong exception");
+        }
+
+        // test length
+        if (!isZero(V4.lengthSquared() - 9))
+            out.println("ERROR: lengthSquared() wrong value");
+        if (!isZero(V4.length() - 3))
+            out.println("ERROR: length() wrong value");
+
+        // test vector normalization vs vector length and cross-product
+        Vector u = V1.normalize();
+        if (!isZero(u.length() - 1))
+            out.println("ERROR: the normalized vector is not a unit vector");
+        try { // test that the vectors are co-lined
+            V1.crossProduct(u);
+            out.println("ERROR: the normalized vector is not parallel to the original one");
+        } catch (Exception _) { /* ignored */ }
+        if (V1.dotProduct(u) < 0)
+            out.println("ERROR: the normalized vector is opposite to the original one");
+
+        // Test scale
+        if (!V1.scale(2).equals(new Vector(2, 4, 6)))
+            out.println("ERROR: scale() wrong result");
+        try {
+            V1.scale(0);
+            out.println("ERROR: scale(0) should throw exception");
+        } catch (IllegalArgumentException _) { /* ignored */ }
+    }
+
+    /**
+     * Basic test for the Ray constructor.
+     * Verifies that the direction vector is normalized by the constructor.
+     */
+    private static void rayTests() {
+        Ray r = new Ray(P1, new Vector(2, 4, 6));
+        if (!isZero(r.direction().length() - 1))
+            out.println("ERROR: Ray direction is not normalized");
     }
 
     /**
