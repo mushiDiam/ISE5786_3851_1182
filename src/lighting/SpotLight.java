@@ -39,21 +39,45 @@ public class SpotLight extends PointLight {
         return this;
     }
 
+    /**
+     * Sets the constant attenuation factor while preserving the fluent SpotLight type.
+     *
+     * @param kC the constant attenuation factor
+     * @return this spotlight instance
+     */
     @Override
     public SpotLight setKc(double kC) {
         return (SpotLight) super.setKc(kC);
     }
 
+    /**
+     * Sets the linear attenuation factor while preserving the fluent SpotLight type.
+     *
+     * @param kL the linear attenuation factor
+     * @return this spotlight instance
+     */
     @Override
     public SpotLight setKl(double kL) {
         return (SpotLight) super.setKl(kL);
     }
 
+    /**
+     * Sets the quadratic attenuation factor while preserving the fluent SpotLight type.
+     *
+     * @param kQ the quadratic attenuation factor
+     * @return this spotlight instance
+     */
     @Override
     public SpotLight setKq(double kQ) {
         return (SpotLight) super.setKq(kQ);
     }
 
+    /**
+     * Returns the spotlight intensity at the given point, including beam falloff.
+     *
+     * @param p the illuminated point
+     * @return the attenuated and beam-scaled intensity, or black if the point is outside the beam
+     */
     @Override
     public Color getIntensity(Point p) {
         double dirL = alignZero(_direction.dotProduct(getL(p)));

@@ -168,4 +168,31 @@ class CylinderTests {
         assertEquals(1, resultBV43.size(), "Wrong number of points");
         assertEquals(List.of(new Point(1, 0, 4)), resultBV43, "Starts bottom base goes up");
     }
+
+    /**
+     * Test method for {@link geometries.api.Intersectable#calcIntersections(Ray, double)}.
+     * Tests the Bonus functionality (Stage 8) ensuring intersections are properly filtered
+     * by the maxDistance parameter.
+     */
+    @Test
+    void testCalcIntersectionsWithMaxDistance() {
+        // Ray crosses from bottom base to top base
+        // Intersections are at z=0 (distance=1) and z=4 (distance=5)
+        Ray ray = new Ray(new Point(0, 0, -1), new Vector(0, 0, 1));
+
+        // TC01: maxDistance is smaller than the first intersection (0 points)
+        assertNull(CYLINDER.calcIntersections(ray, 0.5), "Expected no intersections because maxDistance is too small");
+
+        // TC02: maxDistance is exactly the first intersection (1 point)
+        assertEquals(1, CYLINDER.calcIntersections(ray, 1).size(), "Expected 1 intersection at the maxDistance boundary");
+
+        // TC03: maxDistance is between the two intersections (1 point)
+        assertEquals(1, CYLINDER.calcIntersections(ray, 3).size(), "Expected 1 intersection since second is too far");
+
+        // TC04: maxDistance is exactly the second intersection (2 points)
+        assertEquals(2, CYLINDER.calcIntersections(ray, 5).size(), "Expected 2 intersections at the maxDistance boundary");
+
+        // TC05: maxDistance is larger than the second intersection (2 points)
+        assertEquals(2, CYLINDER.calcIntersections(ray, 6).size(), "Expected 2 intersections since both are within maxDistance");
+    }
 }

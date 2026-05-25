@@ -57,13 +57,6 @@ public final class Vector extends Point {
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        return super.equals(obj);
-    }
-
     /**
      * Add two vectors
      *
@@ -133,5 +126,12 @@ public final class Vector extends Point {
      */
     public Vector normalize() {
         return new Vector(_xyz.scale(1.0 / length()));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return super.equals(obj);
     }
 }

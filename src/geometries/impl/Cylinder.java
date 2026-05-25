@@ -8,25 +8,45 @@ import java.util.List;
 
 /**
  * Represents a finite cylinder in 3D space.
+ * 
+ * A cylinder is defined by a central axis (a ray), a radius, and a height.
+ * Unlike a tube (infinite cylinder), a finite cylinder has two circular bases
+ * at the ends. The surface consists of the lateral (side) surface and two bases.
+ * 
+ * @author [Student ID]
+ * @version 1.0
  */
 public class Cylinder extends Tube {
     /**
-     * The height of the cylinder.
+     * The height of the cylinder measured along the axis direction.
      */
     private final double _height;
 
+
     /**
-     * Constructs a cylinder with a given radius, axis ray, and height.
+     * Constructs a finite cylinder with a given radius, axis ray, and height.
      *
-     * @param radius the radius of the cylinder
-     * @param axis   the central axis ray
-     * @param height the height of the cylinder
+     * @param radius the radius of the cylinder (must be positive)
+     * @param axis   the central axis ray (origin is at the bottom base)
+     * @param height the height of the cylinder along the axis (must be positive)
      */
     public Cylinder(double radius, Ray axis, double height) {
         super(radius, axis);
         _height = height;
     }
 
+
+    /**
+     * Returns the normal vector to the cylinder at a given point on its surface.
+     * 
+     * The normal direction depends on where the point is located:
+     * - On the bottom base: points downward (opposite to axis direction)
+     * - On the top base: points upward (same as axis direction)
+     * - On the side surface: points radially outward from the axis
+     *
+     * @param point a point on the cylinder surface
+     * @return a unit normal vector perpendicular to the surface at the point
+     */
     @Override
     public Vector getNormal(Point point) {
         Point p0 = _axis.origin();
@@ -55,17 +75,26 @@ public class Cylinder extends Tube {
     }
 
     /**
-     * Finds intersections between a ray and the finite cylinder.
-     * Evaluates intersections with the side surface (using Tube logic bounded by height)
-     * and intersections with the two bases.
+     * Calculates intersections between a ray and the finite cylinder.
+     * 
+     * The method evaluates intersections in three stages:
+     * 1. Side surface: Uses Tube logic but strictly bounded by the height limits
+     * 2. Bottom base: Intersection with the circular base at the axis origin
+     * 3. Top base: Intersection with the circular base at the axis origin + height*direction
+     * 
+     * Intersections are filtered to respect the maximum distance constraint.
+     * The method returns at most 2 intersection points (the ray can enter and exit the cylinder,
+     * or intersect one or both bases).
      *
-     * @param ray the ray to intersect with the cylinder
-     * @return a list of intersections, or null if there are none
+     * @param ray         the ray to intersect with the cylinder
+     * @param maxDistance the maximum distance to search for intersections
+     * @return a sorted list of intersections (0, 1, or 2 points), or null if no
+     *         intersections are found within the specified distance
      */
     @Override
-    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
-        // CRITICAL FIX: Call the helper method of the superclass (Tube) per instructions
-        List<Intersection> tubeIntersections = super.calcIntersectionsHelper(ray);
+    protected List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance) {
+        // CRITICAL FIX: Pass the maxDistance to the superclass (Tube)
+        List<Intersection> tubeIntersections = super.calcIntersectionsHelper(ray, maxDistance);
 
         Point p0 = ray.origin();
         Vector v = ray.direction();
@@ -77,9 +106,10 @@ public class Cylinder extends Tube {
         int count = 0;
 
         // 1. Check side intersections from Tube (STRICTLY bounded by height)
+        // Tube already filtered out intersections beyond maxDistance.
         if (tubeIntersections != null) {
             for (Intersection gp : tubeIntersections) {
-                Point p = gp.point; // Extract the actual point from the Intersection
+                Point p = gp.point;
 
                 double tAxis = 0;
                 if (!p.equals(pa1)) {
@@ -103,7 +133,7 @@ public class Cylinder extends Tube {
 
         // 2. Check bases
         double vDotVa = primitives.Util.alignZero(v.dotProduct(va));
-        if (vDotVa != 0) { // If vDotVa == 0, ray is parallel to bases (orthogonal to axis). Bases are ignored.
+        if (vDotVa != 0) { // If vDotVa == 0, ray is parallel to bases. Bases are ignored.
             boolean isParallelToAxis = primitives.Util.isZero(Math.abs(vDotVa) - 1);
 
             // Base 1 (bottom)
@@ -111,7 +141,9 @@ public class Cylinder extends Tube {
             if (!p0.equals(pa1)) {
                 tBase1 = primitives.Util.alignZero(va.dotProduct(pa1.subtract(p0)) / vDotVa);
             }
-            if (tBase1 > 0) {
+
+            // BONUS FILTER: Only consider if tBase1 > 0 AND tBase1 <= maxDistance
+            if (tBase1 > 0 && primitives.Util.alignZero(tBase1 - maxDistance) <= 0) {
                 Point pBase1 = ray.getPoint(tBase1);
                 double dSquared = pBase1.distanceSquared(pa1);
                 double check = primitives.Util.alignZero(dSquared - _radiusSquared);
@@ -133,7 +165,9 @@ public class Cylinder extends Tube {
             if (!p0.equals(pa2)) {
                 tBase2 = primitives.Util.alignZero(va.dotProduct(pa2.subtract(p0)) / vDotVa);
             }
-            if (tBase2 > 0) {
+
+            // BONUS FILTER: Only consider if tBase2 > 0 AND tBase2 <= maxDistance
+            if (tBase2 > 0 && primitives.Util.alignZero(tBase2 - maxDistance) <= 0) {
                 Point pBase2 = ray.getPoint(tBase2);
                 double dSquared = pBase2.distanceSquared(pa2);
                 double check = primitives.Util.alignZero(dSquared - _radiusSquared);
@@ -148,7 +182,7 @@ public class Cylinder extends Tube {
 
         // 3. Final return
         if (count == 1) {
-            return List.of(new Intersection(this, ray.getPoint(t1))); // Fixed type
+            return List.of(new Intersection(this, ray.getPoint(t1)));
         } else if (count == 2) {
             return createSortedList(ray, t1, t2);
         }
@@ -156,19 +190,22 @@ public class Cylinder extends Tube {
         return null;
     }
 
+
     /**
-     * Creates a sorted list of cylinder intersections according to their distance
-     * from the ray origin.
-     *
-     * @param ray the ray used to calculate the intersection points
-     * @param tA  the first intersection distance parameter
-     * @param tB  the second intersection distance parameter
-     * @return a list of intersections sorted by distance from the ray origin
+     * Creates a sorted list of intersections based on distance from ray origin.
+     * 
+     * Ensures that the intersection points are ordered by their distance from the ray origin,
+     * with the closer intersection point appearing first in the list.
+     * 
+     * @param ray the ray for reference to calculate point positions
+     * @param tA  the distance parameter for the first intersection point
+     * @param tB  the distance parameter for the second intersection point
+     * @return a list of two Intersection objects sorted by distance
      */
     private List<Intersection> createSortedList(Ray ray, double tA, double tB) {
         if (tA < tB) {
-            return List.of(new Intersection(this, ray.getPoint(tA)), new Intersection(this, ray.getPoint(tB))); // Fixed types
+            return List.of(new Intersection(this, ray.getPoint(tA)), new Intersection(this, ray.getPoint(tB)));
         }
-        return List.of(new Intersection(this, ray.getPoint(tB)), new Intersection(this, ray.getPoint(tA))); // Fixed types
+        return List.of(new Intersection(this, ray.getPoint(tB)), new Intersection(this, ray.getPoint(tA)));
     }
 }

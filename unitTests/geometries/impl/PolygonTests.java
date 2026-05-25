@@ -1,17 +1,16 @@
 package geometries.impl;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
-
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for class {@link Polygon}.
@@ -171,5 +170,30 @@ class PolygonTests {
         // BV03: Ray intersects on edge's continuation
         assertNull(polygon.findIntersections(new Ray(new Point(3, -1, -1), new Vector(0, 0, 1))),
                 "Ray intersects on edge's continuation");
+    }
+
+    /**
+     * Test method for {@link geometries.api.Intersectable#calcIntersections(Ray, double)}.
+     * Tests the Bonus functionality (Stage 8) ensuring intersections are properly filtered
+     * by the maxDistance parameter.
+     */
+    @Test
+    void testCalcIntersectionsWithMaxDistance() {
+        Polygon polygon = new Polygon(
+                new Point(0, 2, 0), new Point(2, 0, 0),
+                new Point(0, -2, 0), new Point(-2, 0, 0)
+        );
+
+        // Ray orthogonal to the polygon pointing upwards. Intersects at (0, 0, 0) with distance 2.
+        Ray ray = new Ray(new Point(0, 0, -2), new Vector(0, 0, 1));
+
+        // TC01: maxDistance is smaller than the intersection distance
+        assertNull(polygon.calcIntersections(ray, 1), "Expected no intersections because maxDistance is too small");
+
+        // TC02: maxDistance is exactly the intersection distance
+        assertEquals(1, polygon.calcIntersections(ray, 2).size(), "Expected 1 intersection at the maxDistance boundary");
+
+        // TC03: maxDistance is larger than the intersection distance
+        assertEquals(1, polygon.calcIntersections(ray, 3).size(), "Expected 1 intersection since point is within maxDistance");
     }
 }

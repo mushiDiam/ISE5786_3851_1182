@@ -148,4 +148,31 @@ class SphereTests {
         assertEquals(1, result42.size(), "Wrong number of points");
         assertEquals(List.of(new Point(1.5, 0, Math.sqrt(0.75))), result42, "Ray orthogonal to start-to-center line, inside");
     }
+
+    /**
+     * Test method for {@link geometries.api.Intersectable#calcIntersections(Ray, double)}.
+     * Tests the Bonus functionality (Stage 8) ensuring intersections are properly filtered
+     * by the maxDistance parameter.
+     */
+    @Test
+    void testCalcIntersectionsWithMaxDistance() {
+        // Ray starts at (-1, 0, 0) and goes along the X-axis.
+        // Intersects the SPHERE (center (1,0,0), radius 1d) at (0,0,0) [distance 1] and (2,0,0) [distance 3].
+        Ray ray = new Ray(new Point(-1, 0, 0), new Vector(1, 0, 0));
+
+        // TC01: maxDistance is smaller than the first intersection (0 points)
+        assertNull(SPHERE.calcIntersections(ray, 0.5), "Expected no intersections because maxDistance is too small");
+
+        // TC02: maxDistance is exactly the first intersection (1 point)
+        assertEquals(1, SPHERE.calcIntersections(ray, 1).size(), "Expected 1 intersection at the maxDistance boundary");
+
+        // TC03: maxDistance is between the two intersections (1 point)
+        assertEquals(1, SPHERE.calcIntersections(ray, 2).size(), "Expected 1 intersection since second is too far");
+
+        // TC04: maxDistance is exactly the second intersection (2 points)
+        assertEquals(2, SPHERE.calcIntersections(ray, 3).size(), "Expected 2 intersections at the maxDistance boundary");
+
+        // TC05: maxDistance is larger than the second intersection (2 points)
+        assertEquals(2, SPHERE.calcIntersections(ray, 4).size(), "Expected 2 intersections since both are within maxDistance");
+    }
 }

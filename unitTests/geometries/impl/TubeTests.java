@@ -142,4 +142,32 @@ class TubeTests {
         assertNull(TUBE.findIntersections(new Ray(new Point(2, -2, 0), new Vector(0, 1, 1))),
                 "Tangent angled ray");
     }
+
+    /**
+     * Test method for {@link geometries.api.Intersectable#calcIntersections(Ray, double)}.
+     * Tests the Bonus functionality (Stage 8) ensuring intersections are properly filtered
+     * by the maxDistance parameter.
+     */
+    @Test
+    void testCalcIntersectionsWithMaxDistance() {
+        // Ray crosses the tube side-to-side (orthogonal).
+        // Intersects at (-2, 0, 1) [distance 2] and (2, 0, 1) [distance 6].
+        Ray ray = new Ray(new Point(-4, 0, 1), new Vector(1, 0, 0));
+
+        // TC01: maxDistance is smaller than the first intersection (0 points)
+        assertNull(TUBE.calcIntersections(ray, 1), "Expected no intersections because maxDistance is too small");
+
+        // TC02: maxDistance is exactly the first intersection (1 point)
+        assertEquals(1, TUBE.calcIntersections(ray, 2).size(), "Expected 1 intersection at the maxDistance boundary");
+
+        // TC03: maxDistance is between the two intersections (1 point)
+        assertEquals(1, TUBE.calcIntersections(ray, 4).size(), "Expected 1 intersection since second is too far");
+
+        // TC04: maxDistance is exactly the second intersection (2 points)
+        assertEquals(2, TUBE.calcIntersections(ray, 6).size(), "Expected 2 intersections at the maxDistance boundary");
+
+        // TC05: maxDistance is larger than the second intersection (2 points)
+        assertEquals(2, TUBE.calcIntersections(ray, 7).size(), "Expected 2 intersections since both are within maxDistance");
+
+    }
 }

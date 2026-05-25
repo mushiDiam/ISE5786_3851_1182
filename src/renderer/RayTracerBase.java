@@ -88,6 +88,7 @@ abstract class RayTracerBase {
         intersection.nl = alignZero(intersection.n.dotProduct(intersection.l));
         if (intersection.nl * intersection.vn <= 0) return false;
         intersection.iL = lightSource.getIntensity(intersection.point);
+        intersection.light = lightSource;
         return true;
     }
 }

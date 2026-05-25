@@ -11,46 +11,37 @@ import static primitives.Util.isZero;
 
 /**
  * Represents a convex polygon in a 3D Cartesian coordinate system.
- * <p>
- * The polygon is defined by an ordered sequence of vertices.
- * All vertices must lie in the same plane and be arranged along the
- * polygon edge path.
- * </p>
- * <p>
- * The polygon must be convex.
- * </p>
- *
- * @author Dan Zilberstein
+ * 
+ * A polygon is defined by a set of vertices that form a planar, convex shape.
+ * All vertices must be coplanar and ordered consistently (either all clockwise
+ * or all counter-clockwise) to maintain convexity.
+ * 
+ * @author [Student ID]
+ * @version 1.0
  */
 public class Polygon extends Geometry {
-    /**
-     * Ordered list of polygon vertices
-     */
+    /** The list of vertices that define the polygon. */
     protected final List<Point> _vertices;
-    /**
-     * Plane containing the polygon
-     */
+    
+    /** The plane in which the polygon lies. */
     protected final Plane _plane;
-    /**
-     * Number of vertices
-     */
+    
+    /** The number of vertices in the polygon. */
     private final int _size;
 
+
     /**
-     * Constructs a convex polygon from ordered vertices.
-     * <p>
-     * The vertices must:
-     * </p>
-     * <ul>
-     * <li>Contain at least three points</li>
-     * <li>Be ordered along the polygon edge path</li>
-     * <li>Lie in the same plane</li>
-     * <li>Form a convex polygon</li>
-     * </ul>
-     *
-     * @param vertices polygon vertices in edge order
-     * @throws IllegalArgumentException if the vertices do not form a valid convex
-     *                                  polygon
+     * Constructs a polygon from a variable number of vertices.
+     * 
+     * The constructor validates that:
+     * - At least 3 vertices are provided (minimum for a polygon)
+     * - All vertices are coplanar
+     * - The polygon is convex (vertices are ordered consistently)
+     * 
+     * @param vertices at least 3 points defining the polygon vertices
+     * @throws IllegalArgumentException if fewer than 3 vertices are provided,
+     *                                  if vertices are not coplanar, or if
+     *                                  the polygon is not convex
      */
     public Polygon(Point... vertices) {
         if (vertices.length < 3)
@@ -58,25 +49,17 @@ public class Polygon extends Geometry {
         _vertices = List.of(vertices);
         _size = vertices.length;
 
-        // Create the supporting plane using the first three vertices.
-        // The plane stores the constant normal of the polygon.
         _plane = new Plane(vertices[0], vertices[1], vertices[2]);
-        if (_size == 3) return; // no need for more tests for a Triangle
+        if (_size == 3) return;
 
         Vector n = _plane.getNormal(vertices[0]);
-        // Subtracting identical vertices would create a zero vector (illegal)
         Vector edge1 = vertices[_size - 1].subtract(vertices[_size - 2]);
         Vector edge2 = vertices[0].subtract(vertices[_size - 1]);
 
-        // Cross product of consecutive edges determines orientation.
-        // All edge pairs must produce the same sign relative to the normal,
-        // otherwise the polygon is concave or vertices are unordered.
         boolean positive = edge1.crossProduct(edge2).dotProduct(n) > 0;
         for (var i = 1; i < _size; ++i) {
-            // Test that the point is in the same plane as calculated originally
             if (!isZero(vertices[i].subtract(vertices[0]).dotProduct(n)))
                 throw new IllegalArgumentException("All vertices of a polygon must lay in the same plane");
-            // Test the consequent edges have
             edge1 = edge2;
             edge2 = vertices[i].subtract(vertices[i - 1]);
             if (positive != (edge1.crossProduct(edge2).dotProduct(n) > 0))
@@ -84,11 +67,14 @@ public class Polygon extends Geometry {
         }
     }
 
+
     /**
-     * Retrieves the normal vector to the polygon.
-     *
-     * @param point a point on the polygon
-     * @return the normal vector of the plane containing the polygon
+     * Returns the normal vector to the polygon at a given point.
+     * 
+     * The normal is calculated from the plane containing the polygon.
+     * 
+     * @param point a point on the polygon surface
+     * @return a unit normal vector to the polygon
      */
     @Override
     public Vector getNormal(Point point) {
@@ -96,16 +82,21 @@ public class Polygon extends Geometry {
     }
 
     /**
-     * Finds intersections between a ray and the polygon.
-     * Checks if the intersection point with the polygon's plane falls inside the polygon boundaries.
-     *
-     * @param ray the ray to intersect with the polygon
-     * @return a list containing the intersection point, or null if there is none
+     * Calculates intersections between a ray and the polygon.
+     * 
+     * Uses the plane intersection first, then checks if the intersection point
+     * lies within the polygon using the same-side method (cross product technique).
+     * The method filters out intersections beyond the specified maximum distance.
+     * 
+     * @param ray         the ray to intersect with the polygon
+     * @param maxDistance the maximum allowed distance for an intersection
+     * @return a list containing a single intersection if found, or null if no
+     *         intersection exists within the specified distance
      */
     @Override
-    protected List<Intersection> calcIntersectionsHelper(Ray ray) {
-        // First, check if the ray intersects the plane of the polygon
-        var planeIntersections = _plane.findIntersections(ray); // Changed to findIntersections
+    protected List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance) {
+        // Pass maxDistance down to the plane. The plane will handle the distance filtering.
+        var planeIntersections = _plane.calcIntersections(ray, maxDistance);
         if (planeIntersections == null) {
             return null;
         }
@@ -127,15 +118,12 @@ public class Polygon extends Geometry {
             v2 = _vertices.get((i + 1) % _vertices.size()).subtract(p0);
             double currentSign = primitives.Util.alignZero(v.dotProduct(v1.crossProduct(v2)));
 
-            if (currentSign == 0) {
-                return null;
-            }
-            if ((currentSign > 0) != positive) {
+            if (currentSign == 0 || (currentSign > 0) != positive) {
                 return null;
             }
         }
 
-        // Return valid intersection syntax wrapper
-        return List.of(new Intersection(this, planeIntersections.get(0)));
+        // Return the intersection wrapped with the Polygon (this) instead of the Plane
+        return List.of(new Intersection(this, planeIntersections.get(0).point));
     }
 }

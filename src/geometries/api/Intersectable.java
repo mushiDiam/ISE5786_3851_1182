@@ -1,5 +1,6 @@
 package geometries.api;
 
+import lighting.LightSource;
 import primitives.Color;
 import primitives.Material;
 import primitives.Point;
@@ -13,7 +14,7 @@ import java.util.Objects;
  * Abstract class defining the ability to find intersections with a ray.
  * Implements the NVI (Non-Virtual Interface) pattern:
  * public callers use {@link #calcIntersections(Ray)}, which delegates to the
- * protected abstract {@link #calcIntersectionsHelper(Ray)}.
+ * protected abstract {@link #calcIntersectionsHelper(Ray, double)}.
  */
 public abstract class Intersectable {
 
@@ -43,6 +44,11 @@ public abstract class Intersectable {
          * The world-space point of the intersection.
          */
         public final Point point;
+
+        /**
+         * The current light source being evaluated (set by preprocessLightSource).
+         */
+        public LightSource light;
 
         /**
          * The material of the intersected geometry.
@@ -138,22 +144,33 @@ public abstract class Intersectable {
     }
 
     /**
-     * Returns all intersections with the given ray as {@link Intersection} objects
-     * that carry the geometry reference. This is the public NVI entry point.
+     * Finds all intersections between this object and a ray, without limiting the distance.
      *
-     * @param ray the intersecting ray
-     * @return list of {@link Intersection} objects, or {@code null} if there are none
+     * @param ray the ray to intersect with the geometry
+     * @return a list of intersections, or {@code null} if there are none
      */
     public final List<Intersection> calcIntersections(Ray ray) {
-        return calcIntersectionsHelper(ray);
+        return calcIntersections(ray, Double.POSITIVE_INFINITY);
     }
 
     /**
-     * Internal helper that each concrete geometry must implement.
-     * Must return {@code null} (not an empty list) when there are no intersections.
+     * Finds all intersections between this object and a ray up to a maximum distance.
      *
-     * @param ray the intersecting ray
-     * @return list of {@link Intersection} objects, or {@code null} if there are none
+     * @param ray         the ray to intersect with the geometry
+     * @param maxDistance the maximum distance from the ray origin to consider
+     * @return a list of intersections, or {@code null} if there are none within the distance limit
      */
-    protected abstract List<Intersection> calcIntersectionsHelper(Ray ray);
+    public final List<Intersection> calcIntersections(Ray ray, double maxDistance) {
+        return calcIntersectionsHelper(ray, maxDistance);
+    }
+
+    /**
+     * Computes intersections between a ray and the concrete geometry implementation.
+     *
+     * @param ray         the ray to intersect with the geometry
+     * @param maxDistance the maximum distance from the ray origin to consider
+     * @return a list of intersections, or {@code null} if there are none within the distance limit
+     */
+    protected abstract List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance);
+
 }
