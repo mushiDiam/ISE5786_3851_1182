@@ -31,6 +31,23 @@ public class PointLight extends Light implements LightSource {
     private double _kQ = 0.0;
 
     /**
+     * Size of the light source
+     */
+    private double _size = 0;
+
+    /**
+     * Sets the radius of the light source area for soft-shadow sampling.
+     * A size of {@code 0} disables soft shadows for this light (hard shadow only).
+     *
+     * @param size the light source radius in world units (must be ≥ 0)
+     * @return this (for method chaining)
+     */
+    public PointLight setSize(double size) {
+        this._size = size;
+        return this;
+    }
+
+    /**
      * Constructs a point light with the given intensity and position.
      *
      * @param intensity the light's color/intensity
@@ -108,5 +125,16 @@ public class PointLight extends Light implements LightSource {
     @Override
     public double getDistance(Point point) {
         return _position.distance(point);
+    }
+
+    /**
+     * Returns the radius of the light source's area, which is used for soft-shadow sampling.
+     * A size of {@code 0} indicates a point-like light source (no soft shadow effect).
+     *
+     * @return the size (radius) of the light source
+     */
+    @Override
+    public double getSize() {
+        return _size;
     }
 }

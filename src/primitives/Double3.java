@@ -118,22 +118,45 @@ public record Double3(double _d1, double _d2, double _d3) {
     }
 
     /**
-     * Checks whether this triad is greater than a given value.
-     * This is the logical negation of isLowerThan.
+     * Checks whether at least one component is greater than or equal to a given value.
+     * <p>
+     * This method returns {@code true} if <strong>not all</strong> components are
+     * smaller than {@code k}. In other words, it returns {@code true} if at least
+     * one component satisfies {@code component >= k}.
+     * </p>
+     * <p>
+     * <strong>Note:</strong> This is the logical negation of {@link #isLowerThan(double)},
+     * using OR-logic. It does <em>not</em> require that all components are strictly greater
+     * than {@code k}.
+     * </p>
      *
      * @param k the value to compare against
-     * @return true if this triad is not lower than k
+     * @return {@code true} if at least one component is greater than or equal to {@code k},
+     *         {@code false} if all components are strictly smaller than {@code k}
      */
     public boolean isGreaterThan(double k) {
         return !isLowerThan(k);
     }
 
     /**
-     * Checks whether this triad is greater than another triad.
-     * This is the logical negation of isLowerThan.
+     * Checks whether at least one component is greater than or equal to the
+     * corresponding component of another triad.
+     * <p>
+     * This method returns {@code true} if <strong>not all</strong> components of this
+     * triad are smaller than the corresponding components of {@code other}. In other
+     * words, it returns {@code true} if at least one component pair satisfies
+     * {@code this.component >= other.component}.
+     * </p>
+     * <p>
+     * <strong>Note:</strong> This is the logical negation of {@link #isLowerThan(Double3)},
+     * using OR-logic. It does <em>not</em> require that all components are strictly greater
+     * than their corresponding components in {@code other}.
+     * </p>
      *
      * @param other the triad to compare with
-     * @return true if this triad is not lower than the other triad
+     * @return {@code true} if at least one component is greater than or equal to the
+     *         corresponding component in {@code other}, {@code false} if all components
+     *         are strictly smaller than their corresponding components in {@code other}
      */
     public boolean isGreaterThan(Double3 other) {
         return !isLowerThan(other);

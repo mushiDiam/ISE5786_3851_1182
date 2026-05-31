@@ -33,4 +33,12 @@ public interface LightSource {
      * @return the distance
      */
     double getDistance(Point point);
+
+    /**
+     * Returns the radius of the light source's area for soft shadows.
+     * Returns 0 for point-like sources (no soft shadow).
+     *
+     * @return the light source size (radius)
+     */
+    double getSize();
 }

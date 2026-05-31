@@ -12,17 +12,22 @@ import static primitives.Util.alignZero;
  */
 public class SpotLight extends PointLight {
 
-    /** The direction of the spotlight beam (normalized) */
+    /**
+     * The direction of the spotlight beam (normalized)
+     */
     private final Vector _direction;
 
-    /** Narrow beam exponent (1 = regular spot, higher = narrower beam) */
+    /**
+     * Narrow beam exponent (1 = regular spot, higher = narrower beam)
+     */
     private int _narrowBeam = 1;
 
     /**
      * Constructs a spotlight with the given intensity, position and direction.
-     * @param intensity  the light's color/intensity
-     * @param position   the position of the light
-     * @param direction  the direction of the spotlight beam (will be normalized)
+     *
+     * @param intensity the light's color/intensity
+     * @param position  the position of the light
+     * @param direction the direction of the spotlight beam (will be normalized)
      */
     public SpotLight(Color intensity, Point position, Vector direction) {
         super(intensity, position);
@@ -31,6 +36,7 @@ public class SpotLight extends PointLight {
 
     /**
      * Sets the narrow beam exponent. Higher values produce a tighter cone.
+     *
      * @param narrowBeam the exponent
      * @return this (for method chaining)
      */
@@ -47,7 +53,8 @@ public class SpotLight extends PointLight {
      */
     @Override
     public SpotLight setKc(double kC) {
-        return (SpotLight) super.setKc(kC);
+        super.setKc(kC);
+        return this;
     }
 
     /**
@@ -58,7 +65,8 @@ public class SpotLight extends PointLight {
      */
     @Override
     public SpotLight setKl(double kL) {
-        return (SpotLight) super.setKl(kL);
+        super.setKl(kL);
+        return this;
     }
 
     /**
@@ -69,7 +77,8 @@ public class SpotLight extends PointLight {
      */
     @Override
     public SpotLight setKq(double kQ) {
-        return (SpotLight) super.setKq(kQ);
+        super.setKq(kQ);
+        return this;
     }
 
     /**
@@ -84,5 +93,17 @@ public class SpotLight extends PointLight {
         if (dirL <= 0) return Color.BLACK;
         double beamFactor = (_narrowBeam == 1) ? dirL : Math.pow(dirL, _narrowBeam);
         return super.getIntensity(p).scale(beamFactor);
+    }
+
+    /**
+     * Sets the size of the light source while preserving the fluent SpotLight type.
+     *
+     * @param size the size of the light source
+     * @return this spotlight instance
+     */
+    @Override
+    public SpotLight setSize(double size) {
+        super.setSize(size);
+        return this;
     }
 }

@@ -58,40 +58,49 @@ public final class Vector extends Point {
     }
 
     /**
-     * Add two vectors
+     * Adds another vector to this vector using component-wise addition.
      *
      * @param v the vector to add
-     * @return a new vector
+     * @return a new {@code Vector} representing the sum of this vector and {@code v}
      */
     public Vector add(Vector v) {
         return new Vector(_xyz.add(v._xyz));
     }
 
     /**
-     * multiply the vector by a scalar
+     * Multiplies this vector by a scalar value, scaling its magnitude.
      *
-     * @param scalar (must be double, not int)
-     * @return a new vector
+     * @param scalar the scaling factor
+     * @return a new {@code Vector} representing this vector scaled by {@code scalar}
      */
     public Vector scale(double scalar) {
         return new Vector(_xyz.scale(scalar));
     }
 
     /**
-     * dot product between two vector
+     * Computes the dot product (scalar product) of this vector and another vector.
+     * <p>
+     * The dot product is calculated as: {@code x1*x2 + y1*y2 + z1*z2}
+     * </p>
      *
-     * @param u vector
-     * @return a scalar
+     * @param u the vector to compute the dot product with
+     * @return the dot product as a {@code double} value
      */
     public double dotProduct(Vector u) {
         return _xyz._d1() * u._xyz._d1() + _xyz._d2() * u._xyz._d2() + _xyz._d3() * u._xyz._d3();
     }
 
     /**
-     * cross product between two vectors
+     * Computes the cross product (vector product) of this vector and another vector.
+     * <p>
+     * The cross product is a vector perpendicular to both input vectors, with
+     * magnitude equal to the area of the parallelogram formed by the two vectors.
+     * </p>
      *
-     * @param v vector
-     * @return a new vector
+     * @param v the vector to compute the cross product with
+     * @return a new {@code Vector} representing the cross product of this vector and {@code v}
+     * @throws IllegalArgumentException if the resulting vector is the zero vector
+     *                                  (i.e., if this vector and {@code v} are parallel)
      */
     public Vector crossProduct(Vector v) {
         return new Vector(
@@ -102,18 +111,25 @@ public final class Vector extends Point {
     }
 
     /**
-     * calc the length^2 of a vector
+     * Calculates the squared length (squared magnitude) of this vector.
+     * <p>
+     * This method is more efficient than {@link #length()} when only the
+     * squared length is needed, as it avoids the square root computation.
+     * </p>
      *
-     * @return length^2 as a double value
+     * @return the squared length of this vector as a {@code double} value
      */
     public double lengthSquared() {
         return dotProduct(this);
     }
 
     /**
-     * calc the real length of a vector by using lengthSquared method
+     * Calculates the length (magnitude) of this vector.
+     * <p>
+     * The length is computed as the square root of {@link #lengthSquared()}.
+     * </p>
      *
-     * @return length as a double value
+     * @return the length of this vector as a {@code double} value
      */
     public double length() {
         return Math.sqrt(lengthSquared());

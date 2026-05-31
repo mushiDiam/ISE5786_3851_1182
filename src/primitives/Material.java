@@ -46,6 +46,38 @@ public class Material {
     public Double3 kR = Double3.ZERO;
 
     /**
+     * Blur radius for glossy reflection. 0 = perfect mirror.
+     */
+    public double kBlurR = 0;
+
+    /**
+     * Blur radius for diffuse (blurry) transparency. 0 = clear glass.
+     */
+    public double kBlurT = 0;
+
+    /**
+     * Sets the blur reflection coefficient using a scalar value.
+     *
+     * @param blur the blur reflection coefficient
+     * @return the current Material object for chaining
+     */
+    public Material setBlurR(double blur) {
+        kBlurR = blur;
+        return this;
+    }
+
+    /**
+     * Sets the blur transmission coefficient using a scalar value.
+     *
+     * @param blur the blur transmission coefficient
+     * @return the current Material object for chaining
+     */
+    public Material setBlurT(double blur) {
+        kBlurT = blur;
+        return this;
+    }
+
+    /**
      * Sets the transparency coefficient using a scalar value.
      *
      * @param kT transparency coefficient
@@ -77,7 +109,7 @@ public class Material {
         this.kT = kT;
         return this;
     }
-    
+
     /**
      * Sets kR with a Double3 value.
      *

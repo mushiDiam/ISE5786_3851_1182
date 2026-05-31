@@ -53,11 +53,21 @@ public class DirectionalLight extends Light implements LightSource {
     /**
      * Directional lights are effectively at an infinite distance.
      *
-     * @param point the point to measure distance to (unused)
+     * @param unused the point to measure distance to (unused)
      * @return positive infinity
      */
     @Override
-    public double getDistance(Point point) {
+    public double getDistance(Point unused) {
         return Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * Directional lights have no size.
+     *
+     * @return 0 (no size)
+     */
+    @Override
+    public double getSize() {
+        return 0;
     }
 }
