@@ -61,7 +61,7 @@ class SuperSamplingTests {
     /**
      * Render resolution — use 800 for final images, 400 for quick drafts.
      */
-    private static final int RESOLUTION = 1200;
+    private static final int RESOLUTION = 4000;
 
     /**
      * Number of shadow-beam samples per light when soft shadows are enabled.
@@ -164,7 +164,7 @@ class SuperSamplingTests {
                 .setRayTracer(scene, RayTracerType.SIMPLE)
                 // Multi-threading enabled for both tests so render time difference
                 // reflects only the cost of soft shadows, not single vs multi thread
-                .setMultithreading(-2)
+                .setMultithreading(-1)
                 .setDebugPrint(5)
                 .build()
                 .renderImage()
