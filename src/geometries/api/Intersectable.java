@@ -126,6 +126,47 @@ public abstract class Intersectable {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    //  BVH acceleration (Conservative Bounding Region)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * This intersectable's bounding box, or {@code null} when acceleration is
+     * disabled. Built on demand by {@link #buildBoundingBox()} — never in a
+     * constructor — so that running with acceleration OFF costs nothing.
+     */
+    protected AABB _boundingBox;
+
+    /**
+     * Computes the axis-aligned box that encloses this intersectable. Each
+     * concrete geometry returns its own box; a {@code Geometries} group returns
+     * the union of its children's boxes.
+     *
+     * @return the enclosing bounding box
+     */
+    protected abstract AABB calculateBoundingBox();
+
+    /**
+     * Builds and stores this intersectable's bounding box, enabling CBR pruning
+     * in {@link #calcIntersections(Ray, double)}. Called from tests only when
+     * acceleration is wanted (directly, or via {@code Geometries.buildHierarchy()}).
+     *
+     * @return this object, for chaining
+     */
+    public Intersectable buildBoundingBox() {
+        _boundingBox = calculateBoundingBox();
+        return this;
+    }
+
+    /**
+     * Returns this intersectable's bounding box.
+     *
+     * @return the bounding box, or {@code null} if it has not been built
+     */
+    public AABB getBoundingBox() {
+        return _boundingBox;
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     //  NVI public API
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -155,12 +196,21 @@ public abstract class Intersectable {
 
     /**
      * Finds all intersections between this object and a ray up to a maximum distance.
+     * <p>
+     * Applies CBR pruning first: if a bounding box has been built and the ray
+     * misses it, the geometry cannot be hit, so the expensive helper is skipped.
+     * When {@link #_boundingBox} is {@code null} (acceleration OFF) this is a
+     * no-op and the behavior is unchanged. Because every ray type (camera,
+     * shadow, reflection, refraction) flows through this method, the single
+     * check accelerates all of them.
      *
      * @param ray         the ray to intersect with the geometry
      * @param maxDistance the maximum distance from the ray origin to consider
      * @return a list of intersections, or {@code null} if there are none within the distance limit
      */
     public final List<Intersection> calcIntersections(Ray ray, double maxDistance) {
+        if (_boundingBox != null && !_boundingBox.intersects(ray))
+            return null;
         return calcIntersectionsHelper(ray, maxDistance);
     }
 

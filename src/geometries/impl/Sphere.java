@@ -1,5 +1,6 @@
 package geometries.impl;
 
+import geometries.api.AABB;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -8,21 +9,23 @@ import java.util.List;
 
 /**
  * Represents a 3D sphere in a Cartesian coordinate system.
- * 
+ * <p>
  * A sphere is defined by its center point and a radius. All points on the surface
  * of the sphere are at a fixed distance (the radius) from the center.
- * 
+ *
  * @author [Student ID]
  * @version 1.0
  */
 public class Sphere extends RadialGeometry {
-    /** The center point of the sphere. */
+    /**
+     * The center point of the sphere.
+     */
     private final Point _center;
 
 
     /**
      * Constructs a sphere with a given center point and radius.
-     * 
+     *
      * @param center the center of the sphere
      * @param radius the radius of the sphere (must be positive)
      */
@@ -33,9 +36,9 @@ public class Sphere extends RadialGeometry {
 
     /**
      * Returns the normal vector to the sphere at a given point on its surface.
-     * 
+     * <p>
      * The normal vector points radially outward from the center through the point.
-     * 
+     *
      * @param point a point on the sphere surface
      * @return a unit normal vector pointing outward from the center
      */
@@ -46,14 +49,14 @@ public class Sphere extends RadialGeometry {
 
     /**
      * Calculates intersections between a ray and the sphere.
-     * 
+     * <p>
      * Uses the standard ray-sphere intersection algorithm. The method filters
      * out intersections that are behind the ray origin or beyond the maximum distance.
-     * 
+     *
      * @param ray         the ray to intersect with the sphere
      * @param maxDistance the maximum allowed distance for an intersection
      * @return a list of intersections (0, 1, or 2 points), or null if no
-     *         intersections exist within the specified distance
+     * intersections exist within the specified distance
      */
     @Override
     protected List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance) {
@@ -94,5 +97,12 @@ public class Sphere extends RadialGeometry {
         }
 
         return null;
+    }
+
+    @Override
+    protected AABB calculateBoundingBox() {
+        return new AABB(
+                _center.getX() - _radius, _center.getY() - _radius, _center.getZ() - _radius,
+                _center.getX() + _radius, _center.getY() + _radius, _center.getZ() + _radius);
     }
 }

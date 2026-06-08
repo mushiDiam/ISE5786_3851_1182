@@ -43,7 +43,7 @@ import scene.Scene;
  * <ul>
  *   <li>{@code softShadows_OFF.png} — sharp, hard-edged shadow boundaries.</li>
  *   <li>{@code softShadows_ON.png}  — soft, gradient penumbra at shadow edges,
- *       especially visible around the sphere and cylinder bases.</li>
+ *       especially visible around the sphere and pyramid bases.</li>
  * </ul>
  */
 class SuperSamplingTests {
@@ -156,8 +156,8 @@ class SuperSamplingTests {
         long start = System.currentTimeMillis();
 
         Camera.getBuilder()
-                .setLocation(new Point(0, 80, 350))
-                .setDirection(new Point(0, -10, 0), new Vector(0, 1, 0))
+                .setLocation(new Point(80, 135, 350))
+                .setDirection(new Point(0, -15, -15), new Vector(0, 1, 0))
                 .setVpSize(200, 200)
                 .setVpDistance(250)
                 .setResolution(RESOLUTION, RESOLUTION)
@@ -193,8 +193,8 @@ class SuperSamplingTests {
         long start = System.currentTimeMillis();
 
         Camera.getBuilder()
-                .setLocation(new Point(0, 80, 350))
-                .setDirection(new Point(0, -10, 0), new Vector(0, 1, 0))
+                .setLocation(new Point(80, 135, 350))
+                .setDirection(new Point(0, -15, -15), new Vector(0, 1, 0))
                 .setVpSize(200, 200)
                 .setVpDistance(250)
                 .setResolution(RESOLUTION, RESOLUTION)
@@ -232,10 +232,10 @@ class SuperSamplingTests {
      *   <li>Medium sphere, left — blue glass</li>
      *   <li>Small sphere, right — red opaque</li>
      *   <li>Small sphere, back — green opaque</li>
-     *   <li>Tall cylinder (pillar), far left</li>
+     *   <li>Tall cylinder leaning against the left wall</li>
      *   <li>Short cylinder (pedestal), centre-right</li>
-     *   <li>Decorative triangle, on floor left</li>
-     *   <li>Decorative triangle, on floor right</li>
+     *   <li>Purple pyramid, on floor left</li>
+     *   <li>Yellow pyramid, on floor right</li>
      * </ol>
      *
      * <h4>Light list</h4>
@@ -303,10 +303,12 @@ class SuperSamplingTests {
                         .setMaterial(GREEN_MAT)
         );
 
-        // ── Geometry 8: Tall cylinder (pillar), far left ──────────────────────
+        // ── Geometry 8: Tall cylinder leaning against the left wall ───────────
+        //   Base on the floor; axis tilts ~14.5° toward the left wall (x = −160)
+        //   so the top rests against it.
         scene.geometries.add(
                 new Cylinder(12,
-                        new Ray(new Point(-120, -80, -100), new Vector(0, 1, 0)),
+                        new Ray(new Point(-120, -80, -100), new Vector(-0.25, 0.97, 0)),
                         130)
                         .setEmission(new Color(140, 130, 100))
                         .setMaterial(GOLD_MAT)
@@ -321,24 +323,37 @@ class SuperSamplingTests {
                         .setMaterial(WHITE_MAT)
         );
 
-        // ── Geometry 10: Decorative triangle on floor, left ───────────────────
+        // ── Geometry 10: Purple pyramid on floor, left ────────────────────────
+        //   Triangular base on the floor + apex above its centroid → 4 faces
+        Point pBase1 = new Point(-60, -79, 20);
+        Point pBase2 = new Point(-20, -79, 60);
+        Point pBase3 = new Point(-100, -79, 70);
+        Point pApex = new Point(-60, -36, 50);
         scene.geometries.add(
-                new Triangle(
-                        new Point(-60, -79, 20),
-                        new Point(-20, -79, 60),
-                        new Point(-100, -79, 70))
-                        .setEmission(new Color(100, 30, 120))
-                        .setMaterial(PURPLE_MAT)
+                new Triangle(pBase1, pBase2, pApex)
+                        .setEmission(new Color(100, 30, 120)).setMaterial(PURPLE_MAT),
+                new Triangle(pBase2, pBase3, pApex)
+                        .setEmission(new Color(100, 30, 120)).setMaterial(PURPLE_MAT),
+                new Triangle(pBase3, pBase1, pApex)
+                        .setEmission(new Color(100, 30, 120)).setMaterial(PURPLE_MAT),
+                new Triangle(pBase1, pBase2, pBase3)
+                        .setEmission(new Color(100, 30, 120)).setMaterial(PURPLE_MAT)
         );
 
-        // ── Geometry 11: Decorative triangle on floor, right ─────────────────
+        // ── Geometry 11: Yellow pyramid on floor, right ──────────────────────
+        Point yBase1 = new Point(50, -79, 40);
+        Point yBase2 = new Point(120, -79, 20);
+        Point yBase3 = new Point(100, -79, 90);
+        Point yApex = new Point(90, -36, 50);
         scene.geometries.add(
-                new Triangle(
-                        new Point(50, -79, 40),
-                        new Point(120, -79, 20),
-                        new Point(100, -79, 90))
-                        .setEmission(new Color(180, 120, 10))
-                        .setMaterial(GOLD_MAT)
+                new Triangle(yBase1, yBase2, yApex)
+                        .setEmission(new Color(180, 120, 10)).setMaterial(GOLD_MAT),
+                new Triangle(yBase2, yBase3, yApex)
+                        .setEmission(new Color(180, 120, 10)).setMaterial(GOLD_MAT),
+                new Triangle(yBase3, yBase1, yApex)
+                        .setEmission(new Color(180, 120, 10)).setMaterial(GOLD_MAT),
+                new Triangle(yBase1, yBase2, yBase3)
+                        .setEmission(new Color(180, 120, 10)).setMaterial(GOLD_MAT)
         );
 
         // ── Lights ────────────────────────────────────────────────────────────

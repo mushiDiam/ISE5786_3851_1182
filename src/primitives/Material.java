@@ -127,7 +127,7 @@ public class Material {
      * @param kA ambient light attenuation factor
      * @return the current Material object for chaining
      */
-    public Material setKa(Double3 kA) {
+    public Material setKA(Double3 kA) {
         this.kA = kA;
         return this;
     }
@@ -138,7 +138,7 @@ public class Material {
      * @param kA ambient light attenuation factor
      * @return the current Material object for chaining
      */
-    public Material setKa(double kA) {
+    public Material setKA(double kA) {
         this.kA = new Double3(kA);
         return this;
     }

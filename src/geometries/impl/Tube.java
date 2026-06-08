@@ -1,5 +1,6 @@
 package geometries.impl;
 
+import geometries.api.AABB;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -8,22 +9,24 @@ import java.util.List;
 
 /**
  * Represents an infinite tube (infinite cylinder) in 3D space.
- * 
+ * <p>
  * A tube is defined by a central axis (a ray) and a radius. It extends infinitely
  * along both directions of the axis. The surface of the tube consists of all points
  * at a fixed distance (radius) from the axis.
- * 
+ *
  * @author [Student ID]
  * @version 1.0
  */
 public class Tube extends RadialGeometry {
-    /** The central axis of the tube as a ray. */
+    /**
+     * The central axis of the tube as a ray.
+     */
     protected final Ray _axis;
 
 
     /**
      * Constructs a tube with a given radius and axis.
-     * 
+     *
      * @param radius the radius of the tube (must be positive)
      * @param axis   the central axis of the tube as a ray
      */
@@ -35,10 +38,10 @@ public class Tube extends RadialGeometry {
 
     /**
      * Returns the normal vector to the tube at a given point on its surface.
-     * 
+     * <p>
      * The normal is perpendicular to the axis and points from the axis
      * to the given point on the surface.
-     * 
+     *
      * @param point a point on the tube surface
      * @return a unit normal vector
      */
@@ -58,15 +61,15 @@ public class Tube extends RadialGeometry {
 
     /**
      * Calculates intersections between a ray and the tube.
-     * 
+     * <p>
      * Finds where the ray intersects the infinite cylindrical surface, using a
      * quadratic equation derived from the distance formula. The method filters
      * out intersections beyond the specified maximum distance.
-     * 
+     *
      * @param ray         the ray to intersect with the tube
      * @param maxDistance the maximum allowed distance for an intersection
      * @return a list of intersections (0, 1, or 2 points), or null if no
-     *         intersections exist within the specified distance
+     * intersections exist within the specified distance
      */
     @Override
     protected List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance) {
@@ -139,5 +142,10 @@ public class Tube extends RadialGeometry {
         }
 
         return null;
+    }
+
+    @Override
+    protected AABB calculateBoundingBox() {
+        return AABB.INFINITE;
     }
 }

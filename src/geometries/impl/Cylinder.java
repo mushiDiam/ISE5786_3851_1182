@@ -1,5 +1,6 @@
 package geometries.impl;
 
+import geometries.api.AABB;
 import primitives.Point;
 import primitives.Ray;
 import primitives.Vector;
@@ -8,11 +9,11 @@ import java.util.List;
 
 /**
  * Represents a finite cylinder in 3D space.
- * 
+ * <p>
  * A cylinder is defined by a central axis (a ray), a radius, and a height.
  * Unlike a tube (infinite cylinder), a finite cylinder has two circular bases
  * at the ends. The surface consists of the lateral (side) surface and two bases.
- * 
+ *
  * @author [Student ID]
  * @version 1.0
  */
@@ -38,7 +39,7 @@ public class Cylinder extends Tube {
 
     /**
      * Returns the normal vector to the cylinder at a given point on its surface.
-     * 
+     * <p>
      * The normal direction depends on where the point is located:
      * - On the bottom base: points downward (opposite to axis direction)
      * - On the top base: points upward (same as axis direction)
@@ -76,12 +77,12 @@ public class Cylinder extends Tube {
 
     /**
      * Calculates intersections between a ray and the finite cylinder.
-     * 
+     * <p>
      * The method evaluates intersections in three stages:
      * 1. Side surface: Uses Tube logic but strictly bounded by the height limits
      * 2. Bottom base: Intersection with the circular base at the axis origin
      * 3. Top base: Intersection with the circular base at the axis origin + height*direction
-     * 
+     * <p>
      * Intersections are filtered to respect the maximum distance constraint.
      * The method returns at most 2 intersection points (the ray can enter and exit the cylinder,
      * or intersect one or both bases).
@@ -89,7 +90,7 @@ public class Cylinder extends Tube {
      * @param ray         the ray to intersect with the cylinder
      * @param maxDistance the maximum distance to search for intersections
      * @return a sorted list of intersections (0, 1, or 2 points), or null if no
-     *         intersections are found within the specified distance
+     * intersections are found within the specified distance
      */
     @Override
     protected List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance) {
@@ -193,10 +194,10 @@ public class Cylinder extends Tube {
 
     /**
      * Creates a sorted list of intersections based on distance from ray origin.
-     * 
+     * <p>
      * Ensures that the intersection points are ordered by their distance from the ray origin,
      * with the closer intersection point appearing first in the list.
-     * 
+     *
      * @param ray the ray for reference to calculate point positions
      * @param tA  the distance parameter for the first intersection point
      * @param tB  the distance parameter for the second intersection point
@@ -207,5 +208,18 @@ public class Cylinder extends Tube {
             return List.of(new Intersection(this, ray.getPoint(tA)), new Intersection(this, ray.getPoint(tB)));
         }
         return List.of(new Intersection(this, ray.getPoint(tB)), new Intersection(this, ray.getPoint(tA)));
+    }
+
+    @Override
+    protected AABB calculateBoundingBox() {
+        Point base = _axis.origin();
+        Point top = _axis.getPoint(_height);
+        return new AABB(
+                Math.min(base.getX(), top.getX()) - _radius,
+                Math.min(base.getY(), top.getY()) - _radius,
+                Math.min(base.getZ(), top.getZ()) - _radius,
+                Math.max(base.getX(), top.getX()) + _radius,
+                Math.max(base.getY(), top.getY()) + _radius,
+                Math.max(base.getZ(), top.getZ()) + _radius);
     }
 }

@@ -1,5 +1,6 @@
 package geometries.impl;
 
+import geometries.api.AABB;
 import geometries.api.Geometry;
 import primitives.Point;
 import primitives.Ray;
@@ -11,33 +12,39 @@ import static primitives.Util.isZero;
 
 /**
  * Represents a convex polygon in a 3D Cartesian coordinate system.
- * 
+ * <p>
  * A polygon is defined by a set of vertices that form a planar, convex shape.
  * All vertices must be coplanar and ordered consistently (either all clockwise
  * or all counter-clockwise) to maintain convexity.
- * 
+ *
  * @author [Student ID]
  * @version 1.0
  */
 public class Polygon extends Geometry {
-    /** The list of vertices that define the polygon. */
+    /**
+     * The list of vertices that define the polygon.
+     */
     protected final List<Point> _vertices;
-    
-    /** The plane in which the polygon lies. */
+
+    /**
+     * The plane in which the polygon lies.
+     */
     protected final Plane _plane;
-    
-    /** The number of vertices in the polygon. */
+
+    /**
+     * The number of vertices in the polygon.
+     */
     private final int _size;
 
 
     /**
      * Constructs a polygon from a variable number of vertices.
-     * 
+     * <p>
      * The constructor validates that:
      * - At least 3 vertices are provided (minimum for a polygon)
      * - All vertices are coplanar
      * - The polygon is convex (vertices are ordered consistently)
-     * 
+     *
      * @param vertices at least 3 points defining the polygon vertices
      * @throws IllegalArgumentException if fewer than 3 vertices are provided,
      *                                  if vertices are not coplanar, or if
@@ -70,9 +77,9 @@ public class Polygon extends Geometry {
 
     /**
      * Returns the normal vector to the polygon at a given point.
-     * 
+     * <p>
      * The normal is calculated from the plane containing the polygon.
-     * 
+     *
      * @param point a point on the polygon surface
      * @return a unit normal vector to the polygon
      */
@@ -83,15 +90,15 @@ public class Polygon extends Geometry {
 
     /**
      * Calculates intersections between a ray and the polygon.
-     * 
+     * <p>
      * Uses the plane intersection first, then checks if the intersection point
      * lies within the polygon using the same-side method (cross product technique).
      * The method filters out intersections beyond the specified maximum distance.
-     * 
+     *
      * @param ray         the ray to intersect with the polygon
      * @param maxDistance the maximum allowed distance for an intersection
      * @return a list containing a single intersection if found, or null if no
-     *         intersection exists within the specified distance
+     * intersection exists within the specified distance
      */
     @Override
     protected List<Intersection> calcIntersectionsHelper(Ray ray, double maxDistance) {
@@ -125,5 +132,20 @@ public class Polygon extends Geometry {
 
         // Return the intersection wrapped with the Polygon (this) instead of the Plane
         return List.of(new Intersection(this, planeIntersections.get(0).point));
+    }
+
+    @Override
+    protected AABB calculateBoundingBox() {
+        double minX = Double.POSITIVE_INFINITY, minY = minX, minZ = minX;
+        double maxX = Double.NEGATIVE_INFINITY, maxY = maxX, maxZ = maxX;
+        for (primitives.Point v : _vertices) {
+            minX = Math.min(minX, v.getX());
+            maxX = Math.max(maxX, v.getX());
+            minY = Math.min(minY, v.getY());
+            maxY = Math.max(maxY, v.getY());
+            minZ = Math.min(minZ, v.getZ());
+            maxZ = Math.max(maxZ, v.getZ());
+        }
+        return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 }

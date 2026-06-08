@@ -175,11 +175,11 @@ class RenderStage6Tests {
         scene.geometries
                 .add(
                         // Sphere with general attenuation
-                        _sphere.setMaterial(new primitives.Material().setKa(0.2)),
+                        _sphere.setMaterial(new primitives.Material().setKA(0.2)),
                         // Triangles acting as color filters (Red, Green, Blue)
-                        _triangleLeftTop.setMaterial(new primitives.Material().setKa(new primitives.Double3(0, 0.8, 0))),
-                        _triangleLeftBottom.setMaterial(new primitives.Material().setKa(new primitives.Double3(0.8, 0, 0))),
-                        _triangleRightBottom.setMaterial(new primitives.Material().setKa(new primitives.Double3(0, 0, 0.8)))
+                        _triangleLeftTop.setMaterial(new primitives.Material().setKA(new primitives.Double3(0, 0.8, 0))),
+                        _triangleLeftBottom.setMaterial(new primitives.Material().setKA(new primitives.Double3(0.8, 0, 0))),
+                        _triangleRightBottom.setMaterial(new primitives.Material().setKA(new primitives.Double3(0, 0, 0.8)))
                 );
 
         createImage(scene, "ambient render test");

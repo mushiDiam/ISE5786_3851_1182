@@ -175,4 +175,44 @@ class ShadowTests {
         _scene.setAmbientLight(new AmbientLight(new Color(38, 38, 38)));
     }
 
+    /**
+     * Renders and generates an image of a scene consisting of two triangles and a sphere.
+     * <p>
+     * The method creates a 3D scene with the following components:
+     * - Two triangles with specified vertices and material properties.
+     * - A sphere with defined radius, emission color, and material properties.
+     * - Ambient light to provide uniform lighting across the scene.
+     * - A spotlight positioned and directed to illuminate the scene.
+     * <p>
+     * The camera is configured to render the scene at a specific resolution, and
+     * the final rendered image is written to a file named "shadowTrianglesSphere2".
+     * <p>
+     * This test is designed to evaluate the rendering of shading effects caused by
+     * the spotlight interacting with the sphere and the triangles.
+     *
+     * @author Moshe Diamandi
+     */
+    @Test
+    public void trianglesSphere() {
+        Material triangleMaterial = new Material().setKS(0.8).setShininess(60).setKA(0.15);
+        _scene.geometries //
+                .add( //
+                        new Triangle(new Point(-150, -150, -115), new Point(150, -150, -135), new Point(75, 75, -150)) //
+                                .setMaterial(triangleMaterial), //
+                        new Triangle(new Point(-150, -150, -115), new Point(-70, 70, -140), new Point(75, 75, -150)) //
+                                .setMaterial(triangleMaterial), //
+                        new Sphere(new Point(0, 0, -11), 30d) //
+                                .setEmission(new Color(BLUE)) //
+                                .setMaterial(new Material().setKD(0.5).setKS(0.5).setShininess(30).setKA(0.15)) //
+                );
+        _scene.setAmbientLight(new AmbientLight(new Color(java.awt.Color.WHITE)));
+        _scene.lights //
+                .add(new SpotLight(new Color(700, 400, 400), new Point(40, 40, 115), new Vector(-1, -1, -4)) //
+                        .setKl(4E-4).setKq(2E-5));
+
+        _cameraBuilder.setResolution(600, 600) //
+                .build() //
+                .renderImage() //
+                .writeToImage("shadowTrianglesSphereFixed");
+    }
 }
