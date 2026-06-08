@@ -49,11 +49,11 @@ import java.util.Map;
 public class SceneBuilder {
 
     /**
-     * Constructs a new SceneBuilder.
+     * Constructs a new SceneBuilder for javadoc purposes.
      */
     public SceneBuilder() {
     }
-    
+
     /**
      * Builds a complete {@link Scene} from a parsed JSON tree.
      *
