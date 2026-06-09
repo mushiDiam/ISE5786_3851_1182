@@ -8,7 +8,7 @@ practical.
 
 > **Course:** Introduction to Software Engineering · JCT
 > **Project:** `ISE5786_3851_1182`
-> **Author:** _<your name & ID here>_
+> **Author:** Moshe Diamandi and Eliran Mimoun
 
 ---
 
