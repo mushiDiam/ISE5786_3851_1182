@@ -30,6 +30,12 @@ import scene.Scene;
  * {@link #buildScene()}), so the comparison is fair. Acceleration is switched on
  * purely from the test by calling {@code scene.geometries.buildHierarchy()};
  * leaving it out renders the flat scene. No system code changes between runs.</p>
+ *
+ * <p>The Mini-Project 1 improvement (<b>soft shadows</b>) is kept <b>enabled</b>
+ * in every run — each light is given a non-zero size via
+ * {@code setSize(LIGHT_SIZE)} and the shadow beam uses {@value #SHADOW_SAMPLES}
+ * samples — so the acceleration is measured under a realistic super-sampling
+ * load, as the mini-project requires.</p>
  */
 class BvhTimingTests {
 
@@ -55,9 +61,20 @@ class BvhTimingTests {
     private static final double SPACING = 30;
 
     /**
+     * Area-light radius enabling the MP1 soft-shadow feature during measurement.
+     */
+    private static final double LIGHT_SIZE = 10;
+
+    /**
+     * Soft-shadow beam samples per light (the MP1 super-sampling load).
+     */
+    private static final int SHADOW_SAMPLES = 49;
+
+    /**
      * Builds the shared benchmark scene: a {@value GRID}³ lattice of small
-     * spheres plus several light sources. A fresh, identical scene is returned
-     * on every call, so each configuration starts from the same content.
+     * spheres plus several area light sources. A fresh, identical scene is
+     * returned on every call, so each configuration starts from the same content.
+     * Every light has a non-zero size, so the MP1 soft-shadow feature is active.
      *
      * @return the benchmark scene
      */
@@ -81,17 +98,17 @@ class BvhTimingTests {
                                     .setEmission(c).setMaterial(mat));
                 }
 
-        // Five light sources of different kinds and positions
+        // Five area light sources (size > 0 → MP1 soft shadows active in every run)
         scene.lights.add(new DirectionalLight(new Color(60, 60, 70), new Vector(-1, -1, -1)));
         scene.lights.add(new PointLight(new Color(200, 120, 80), new Point(150, 150, 50))
-                .setKl(0.0005).setKq(0.0002));
+                .setKl(0.0005).setKq(0.0002).setSize(LIGHT_SIZE));
         scene.lights.add(new PointLight(new Color(80, 120, 200), new Point(-150, 150, 50))
-                .setKl(0.0005).setKq(0.0002));
+                .setKl(0.0005).setKq(0.0002).setSize(LIGHT_SIZE));
         scene.lights.add(new SpotLight(new Color(180, 180, 120),
                 new Point(0, 200, 100), new Vector(0, -1, -1))
-                .setKl(0.0004).setKq(0.0002));
+                .setKl(0.0004).setKq(0.0002).setSize(LIGHT_SIZE));
         scene.lights.add(new PointLight(new Color(120, 200, 120), new Point(0, -180, 80))
-                .setKl(0.0005).setKq(0.0002));
+                .setKl(0.0005).setKq(0.0002).setSize(LIGHT_SIZE));
 
         return scene;
     }

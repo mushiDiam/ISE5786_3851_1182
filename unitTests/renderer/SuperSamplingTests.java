@@ -61,7 +61,7 @@ class SuperSamplingTests {
     /**
      * Render resolution — use 800 for final images, 400 for quick drafts.
      */
-    private static final int RESOLUTION = 4000;
+    private static final int RESOLUTION = 800;
 
     /**
      * Number of shadow-beam samples per light when soft shadows are enabled.

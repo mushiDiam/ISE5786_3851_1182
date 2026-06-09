@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 790" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/>
+        </marker>
+    </defs>
+
+    <!-- page background (keeps text readable in light & dark GitHub themes) -->
+    <rect x="0" y="0" width="900" height="790" rx="14" fill="#ffffff"/>
+
+    <!-- header -->
+    <text x="450" y="40" text-anchor="middle" font-size="23" font-weight="700" fill="#0f172a">Ray Tracer — Architecture
+        &amp; Ray Flow
+    </text>
+    <text x="450" y="62" text-anchor="middle" font-size="13" fill="#64748b">A ray's journey from the camera to a pixel
+    </text>
+
+    <!-- foundation panel (primitives) -->
+    <rect x="24" y="92" width="206" height="636" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="127" y="120" text-anchor="middle" font-size="14" font-weight="700" fill="#334155">primitives</text>
+    <text x="127" y="138" text-anchor="middle" font-size="11" fill="#94a3b8">(immutable foundation)</text>
+    <text x="127" y="172" text-anchor="middle" font-size="12.5" fill="#475569">Point · Vector · Ray</text>
+    <text x="127" y="194" text-anchor="middle" font-size="12.5" fill="#475569">Color · Material</text>
+    <text x="127" y="216" text-anchor="middle" font-size="12.5" fill="#475569">Double3 · Util</text>
+    <text x="127" y="250" text-anchor="middle" font-size="12.5" font-weight="700" fill="#b45309">Blackboard</text>
+    <text x="127" y="268" text-anchor="middle" font-size="10.5" fill="#94a3b8">one sampling engine for</text>
+    <text x="127" y="282" text-anchor="middle" font-size="10.5" fill="#94a3b8">all 4 MP1 effects</text>
+
+    <!-- pipeline boxes (centered column) -->
+    <!-- 1 Camera -->
+    <rect x="262" y="80" width="376" height="64" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.6"/>
+    <text x="450" y="108" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Camera</text>
+    <text x="450" y="128" text-anchor="middle" font-size="11.5" fill="#475569">Builder · casts rays · anti-aliasing +
+        depth-of-field
+    </text>
+
+    <!-- 2 RayTracer -->
+    <rect x="262" y="178" width="376" height="64" rx="10" fill="#eef2f7" stroke="#94a3b8" stroke-width="1.6"/>
+    <text x="450" y="206" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">SimpleRayTracer</text>
+    <text x="450" y="226" text-anchor="middle" font-size="11.5" fill="#475569">recursive Phong · &#8635; reflection /
+        refraction / soft shadows
+    </text>
+
+    <!-- 3 Scene -->
+    <rect x="262" y="276" width="376" height="64" rx="10" fill="#eef2f7" stroke="#94a3b8" stroke-width="1.6"/>
+    <text x="450" y="304" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Scene</text>
+    <text x="450" y="324" text-anchor="middle" font-size="11.5" fill="#475569">geometries · lights · ambient ·
+        background
+    </text>
+
+    <!-- 4 Geometries (MP2) -->
+    <rect x="262" y="374" width="376" height="64" rx="10" fill="#d1faf0" stroke="#0d9488" stroke-width="1.8"/>
+    <text x="450" y="402" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Geometries</text>
+    <text x="450" y="422" text-anchor="middle" font-size="11.5" fill="#475569">Composite pattern — the BVH tree (group
+        of groups)
+    </text>
+
+    <!-- 5 Intersectable NVI (MP2) -->
+    <rect x="262" y="472" width="376" height="64" rx="10" fill="#d1faf0" stroke="#0d9488" stroke-width="1.8"/>
+    <text x="450" y="500" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Intersectable · NVI
+    </text>
+    <text x="450" y="520" text-anchor="middle" font-size="11.5" fill="#475569">CBR: ray misses AABB &#8594; prune branch
+        · hits &#8594; descend
+    </text>
+
+    <!-- 6 Geometry leaf -->
+    <rect x="262" y="570" width="376" height="64" rx="10" fill="#eef2f7" stroke="#94a3b8" stroke-width="1.6"/>
+    <text x="450" y="598" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Geometry (leaf)</text>
+    <text x="450" y="618" text-anchor="middle" font-size="11.5" fill="#475569">Sphere · Triangle · Plane · Polygon ·
+        Cylinder · Tube
+    </text>
+
+    <!-- 7 Output -->
+    <rect x="262" y="668" width="376" height="60" rx="10" fill="#e2e8f0" stroke="#64748b" stroke-width="1.6"/>
+    <text x="450" y="694" text-anchor="middle" font-size="16" font-weight="700" fill="#0f172a">Color &#8594; Image
+        (PNG)
+    </text>
+    <text x="450" y="714" text-anchor="middle" font-size="11.5" fill="#475569">per-pixel color written to the rendered
+        image
+    </text>
+
+    <!-- vertical arrows -->
+    <line x1="450" y1="144" x2="450" y2="176" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="450" y1="242" x2="450" y2="274" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="450" y1="340" x2="450" y2="372" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="450" y1="438" x2="450" y2="470" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="450" y1="536" x2="450" y2="568" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="450" y1="634" x2="450" y2="666" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- recursion arrow: leaf/shading back up to ray tracer -->
+    <path d="M638,602 C700,602 700,210 642,210" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="5,4"
+          marker-end="url(#arrow)"/>
+    <text x="712" y="404" text-anchor="middle" font-size="11" fill="#94a3b8" transform="rotate(90 712 404)">&#8635;
+        secondary rays
+    </text>
+
+    <!-- right callouts -->
+    <rect x="660" y="84" width="216" height="52" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.3"/>
+    <text x="668" y="104" font-size="11.5" font-weight="700" fill="#b45309">MP1 — super-sampling</text>
+    <text x="668" y="122" font-size="10.5" fill="#92400e">soft shadows · glossy · AA · DoF</text>
+
+    <rect x="660" y="476" width="216" height="56" rx="8" fill="#ecfdf5" stroke="#5eead4" stroke-width="1.3"/>
+    <text x="668" y="496" font-size="11.5" font-weight="700" fill="#0f766e">MP2 — BVH acceleration</text>
+    <text x="668" y="513" font-size="10.5" fill="#115e59">one NVI check accelerates</text>
+    <text x="668" y="527" font-size="10.5" fill="#115e59">every ray type · O(n) &#8594; O(log n)</text>
+
+    <!-- legend -->
+    <rect x="262" y="748" width="14" height="14" rx="3" fill="#fef3c7" stroke="#f59e0b"/>
+    <text x="283" y="760" font-size="11.5" fill="#475569">MP1 super-sampling</text>
+    <rect x="430" y="748" width="14" height="14" rx="3" fill="#d1faf0" stroke="#0d9488"/>
+    <text x="451" y="760" font-size="11.5" fill="#475569">MP2 BVH acceleration</text>
+</svg>
