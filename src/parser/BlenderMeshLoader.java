@@ -32,6 +32,11 @@ import java.util.Map;
  * → slate, {@code ..._base_wood_...} → brown). The color is applied as a
  * <i>colored diffuse coefficient</i> so the surface is properly shaded by the
  * lights, plus a low matching emission so shadowed areas keep their hue.</p>
+ *
+ * <h3>Robust triangulation</h3>
+ * <p>Polygons are fan-triangulated. Some faces are non-planar n-gons whose fan
+ * produces thin "sliver" triangles that render as shards spanning the scene;
+ * any triangle with area below {@link #MIN_TRIANGLE_AREA} is therefore dropped.</p>
  */
 public final class BlenderMeshLoader {
 
@@ -43,7 +48,14 @@ public final class BlenderMeshLoader {
     /**
      * Fraction of the albedo emitted as a base tone, so shadows are not black.
      */
-    private static final double EMISSION_BASE = 32.0;
+    private static final double EMISSION_BASE = 40.0;
+
+    /**
+     * Minimum world-space area for a triangle to be kept. Filters out the thin
+     * sliver triangles produced by fan-triangulating non-planar n-gons, which
+     * otherwise render as shards spanning the scene.
+     */
+    private static final double MIN_TRIANGLE_AREA = 1e-3;
 
     /**
      * Cache of resolved surfaces, keyed by material name.
@@ -111,7 +123,14 @@ public final class BlenderMeshLoader {
                     int i1 = ((Number) poly.get(i)).intValue();
                     int i2 = ((Number) poly.get(i + 1)).intValue();
                     try {
-                        scene.geometries.add(new Triangle(pts[i0], pts[i1], pts[i2])
+                        Point a = pts[i0], b = pts[i1], c = pts[i2];
+                        // Drop sliver / spanning triangles from non-planar faces
+                        double area = 0.5 * b.subtract(a).crossProduct(c.subtract(a)).length();
+                        if (area < MIN_TRIANGLE_AREA) {
+                            skipped++;
+                            continue;
+                        }
+                        scene.geometries.add(new Triangle(a, b, c)
                                 .setEmission(surface.emission())
                                 .setMaterial(surface.material()));
                         kept++;
@@ -122,7 +141,7 @@ public final class BlenderMeshLoader {
             }
         }
 
-        System.out.printf("[Shrine] loaded %d triangles (skipped %d degenerate)%n", kept, skipped);
+        System.out.printf("[Shrine] loaded %d triangles (skipped %d degenerate/sliver)%n", kept, skipped);
         return scene;
     }
 
@@ -170,57 +189,57 @@ public final class BlenderMeshLoader {
             ks = 0.60;
             shininess = 250;
         } else if (n.contains("paper")) {
-            r = 0.86;
-            g = 0.80;
-            b = 0.62;
+            r = 0.90;
+            g = 0.84;
+            b = 0.66;
             ks = 0.05;
             shininess = 20;
         } else if (n.contains("holder")) {
-            r = 0.16;
-            g = 0.14;
-            b = 0.13;
+            r = 0.20;
+            g = 0.17;
+            b = 0.15;
             ks = 0.35;
             shininess = 80;
         } else if (n.contains("straw") || n.contains("tamati")) {
-            r = 0.68;
-            g = 0.57;
-            b = 0.36;
+            r = 0.70;
+            g = 0.58;
+            b = 0.37;
             ks = 0.05;
             shininess = 20;
         } else if (n.contains("dark_wood")) {
-            r = 0.26;
-            g = 0.17;
-            b = 0.10;
+            r = 0.34;
+            g = 0.22;
+            b = 0.13;
             ks = 0.10;
             shininess = 30;
         } else if (n.contains("wood")) {
-            r = 0.50;
-            g = 0.33;
-            b = 0.18;
+            r = 0.55;
+            g = 0.37;
+            b = 0.20;
             ks = 0.10;
             shininess = 30;
         } else if (n.contains("roof_stone")) {
-            r = 0.34;
-            g = 0.38;
-            b = 0.45;
+            r = 0.42;
+            g = 0.45;
+            b = 0.52;
             ks = 0.18;
             shininess = 50;
         } else if (n.contains("rock")) {
-            r = 0.46;
-            g = 0.43;
-            b = 0.38;
+            r = 0.52;
+            g = 0.49;
+            b = 0.44;
             ks = 0.10;
             shininess = 30;
         } else if (n.contains("stone")) {
-            r = 0.46;
-            g = 0.46;
-            b = 0.48;
+            r = 0.52;
+            g = 0.52;
+            b = 0.54;
             ks = 0.12;
             shininess = 40;
         } else {
-            r = 0.55;
-            g = 0.55;
-            b = 0.55;
+            r = 0.58;
+            g = 0.58;
+            b = 0.58;
             ks = 0.10;
             shininess = 30;
         }
